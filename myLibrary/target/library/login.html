@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<title>爱•借书</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!-- Le styles -->
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet" />
+<!-- <script type="text/javascript" src="js/bootstrap-alert.js"></script> -->
+
+<style>
+
+
+.container {
+	margin-top: 150px;
+	margin-left: auto;
+	margin-right: auto;
+}
+      .form-signin {
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+        -webkit-border-radius: 5px;
+           -moz-border-radius: 5px;
+                border-radius: 5px;
+        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+           -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+                box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      }
+</style>
+
+</head>
+
+<body>
+
+	<div class="container">
+	<div class=" form-signin">
+		<form class="form-actions" id="login" name="login" action="/user/userLogin"  method="post">
+			<div class="input-append">
+			<input class="span4" type="email" required name="passport" placeholder="账号">			
+			<input class="span4" type="password" required name="password" placeholder="密码">
+			<button id="loginBtn" type="submit" class="btn  btn-success">登录</button>
+			</div>
+			<a class="alert loginMsg" data-dismiss="alert" style="display:none;"></a>
+				
+		</form> 
+		
+		<form class="form-actions" id="register" name="register" action="/user/userRegister"  method="post">
+			<div class="input-append">
+			<input class="span4" type="email" required name="passport" placeholder="账号" title="账号">			 
+			<input class="span4" type="password" required name="password" placeholder="密码" title="密码">
+			<button id="regBtn" type="submit" class="btn  btn-primary">注册</button>
+			</div>				
+			<a class="registerMsg" data-dismiss="alert" style="display:none;"></a>	
+							
+		</form>
+    </div>
+	</div>
+</body>
+<script type="text/javascript" src="js/jquery-1.9.1.js"></script> 
+<script type="text/javascript" src="js/jquery.form.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		
+		if($.cookie('user_name')!=null){
+			location.href = "/user/myself";
+		};
+		
+		var loginOptions = {
+			//target:        '.alert',   // target element(s) to be updated with server response 
+			beforeSubmit : loginRequest, // pre-submit callback 
+			success : loginResponse, // post-submit callback     
+			dataType : 'json', // 'xml', 'script', or 'json' (expected server response type) 
+			clearForm : true, // clear all form fields after successful submit 
+			resetForm : true
+		// reset the form after successful submit      
+		};
+		// bind to the form's submit event 
+		$('#login').submit(function() {
+			$(this).ajaxSubmit(loginOptions);
+			return false;
+		});
+
+		var registerOptions = {
+			//target:        '.alert',   // target element(s) to be updated with server response 
+			beforeSubmit : registerRequest, // pre-submit callback 
+			success : registerResponse, // post-submit callback     
+			dataType : 'json', // 'xml', 'script', or 'json' (expected server response type) 
+			clearForm : true, // clear all form fields after successful submit 
+			resetForm : true
+		// reset the form after successful submit      
+		};
+		// bind to the form's submit event 
+		$('#register').submit(function() {
+			$(this).ajaxSubmit(registerOptions);
+			return false;
+		});
+	});
+
+	// pre-submit callback 
+	function loginRequest(formData, jqForm, options) {
+		var queryString = $.param(formData);
+		// var formElement = jqForm[0]; 
+		$('.loginMsg').hide();
+		//alert('About to submit: \n\n' + queryString);  
+		return true;
+	}
+
+	// post-submit callback 
+	function loginResponse(responseText, statusText, xhr, $form) {
+		if(responseText.msg.status!=-1){
+			location.href = "/user/myself";
+		}else{
+			$('.loginMsg').html(responseText.msg);
+			$('.loginMsg').show();
+		}		
+		//$('#loginBtn').popover(responseText.msg);
+	}
+
+	// pre-submit callback 
+	function registerRequest(formData, jqForm, options) {
+		var queryString = $.param(formData);
+		// var formElement = jqForm[0]; 
+		$('.registerMsg').hide();
+		//alert('About to submit: \n\n' + queryString);  
+		return true;
+	}
+
+	// post-submit callback 
+	function registerResponse(responseText, statusText, xhr, $form) {
+		if(responseText.msg.status!=-1){
+			location.href = "/user/myself";
+		}else{
+			$('.registerMsg').html(responseText.msg);
+			$('.registerMsg').show();
+		}
+		//$('#regBtn').popover(responseText.msg);
+	}
+</script>
+</html>
