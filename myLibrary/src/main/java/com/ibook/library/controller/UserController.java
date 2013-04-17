@@ -25,6 +25,11 @@ import com.ibook.library.util.MD5;
 import com.ibook.library.util.StringUtil;
 import com.ibook.library.vo.UserLibraryVo;
 
+/**
+ * 
+ * @author xiaojianyu
+ *
+ */
 @Controller
 public class UserController extends BaseController {
 
