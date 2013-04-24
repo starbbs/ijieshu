@@ -65,6 +65,10 @@ public class Library implements Serializable {
     /** 街号streetNumber **/
     @Column(name = "street_number")   
     private String streetNumber;
+
+    /** 是否对外开放forPublic **/
+    @Column(name = "for_public") 
+    private boolean forPublic;
     
     public int getId() {
         return id;
@@ -168,6 +172,14 @@ public class Library implements Serializable {
 
     public void setStreetNumber(String streetNumber) {
         this.streetNumber = streetNumber;
+    }
+
+    public boolean isForPublic() {
+        return forPublic;
+    }
+
+    public void setForPublic(boolean forPublic) {
+        this.forPublic = forPublic;
     }
     
 }
