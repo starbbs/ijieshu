@@ -403,6 +403,7 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
                 library.setPhoto(rs.getString("photo"));
                 library.setDesc(rs.getString("library_desc"));
                 library.setCreateUserId(rs.getInt("create_user_id"));
+                library.setForPublic(rs.getBoolean("for_public"));
             }
         } catch (Exception e) {
             logger.error("sql ERROR"+e);
@@ -578,6 +579,8 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
                 library.setLongitude(rs.getFloat("longitude"));
                 library.setLatitude(rs.getFloat("latitude"));
                 library.setAddress(rs.getString("address"));
+                library.setForPublic(rs.getBoolean("for_public"));
+
                 list.add(library);
             }
         } catch (Exception e) {
