@@ -40,23 +40,23 @@
 			<div  class="container-fluid">
 				<%for(BookVo book : bookList){
 				%>
-				<div class="span2" style="width: 120px;">
+				<div class="bookspan2" style="width: 120px;">
 					<% if(book.getStatus()==Constants.BOOK_STATUS_FREE && book.getOwnerUserId()!=userId){	%>
-					<a class="thumbnail"  title="借阅 《<%=book.getTitle()%>》" href="javascript:borrowRequest('<%=book.getId()%>','<%=book.getTitle()%>')">
+					<a class="thumbnail by" rel="<%=book.getTitle()%>" bid="<%=book.getId()%>" title="借阅 《<%=book.getTitle()%>》">
 						<img src="<%=book.getMediumImg()%>" alt="<%=book.getTitle()%>" />
 					</a>
 					<a title="豆瓣书评" href="<%=book.getAlt()%>" target="blank">
 						豆瓣书评(可借阅)
 					</a>		
 					<%}else if(book.getStatus()!=Constants.BOOK_STATUS_FREE){ %>
-					<a class="thumbnail"  title="<%=book.getTitle()%>">
+					<a class="thumbnail bn"  rel="<%=book.getTitle()%>" bid="<%=book.getId()%>"  title="<%=book.getTitle()%>">
 						<img src="<%=book.getMediumImg()%>" alt="<%=book.getTitle()%>" />
 					</a>
 					<a title="豆瓣书评" href="<%=book.getAlt()%>" target="blank">
 						豆瓣书评(已外借)
 					</a>				
 					<%}else{ %>
-					<a class="thumbnail"  title="<%=book.getTitle()%>">
+					<a class="thumbnail bn"  rel="<%=book.getTitle()%>" bid="<%=book.getId()%>"  title="<%=book.getTitle()%>">
 						<img src="<%=book.getMediumImg()%>" alt="<%=book.getTitle()%>" />
 					</a>
 					<a title="豆瓣书评" href="<%=book.getAlt()%>" target="blank">

@@ -31,7 +31,9 @@
 		<link href="http://zjdesj.github.io/javascript/mycss/main.css" rel="stylesheet" />
 
 		<script type="text/javascript">
-			var iS = typeof iS == 'undefined' ? {}:iS;
+			if(typeof iS == 'undefined'){
+				var iS =  {};
+			}
 			iS.globalUserId=<%=userId%>;
 		</script>
 	</head>
@@ -50,16 +52,16 @@
 					<legend>新书上架</legend>
 					<%for(BookVo book : bookList){
 					%>
-					<div class="span2" style="width: 120px;">
+					<div class="bookspan2" style="width: 120px;">
 						<% if(book.getStatus()==Constants.BOOK_STATUS_FREE){	%>
-						<a class="thumbnail"  title="借阅 《<%=book.getTitle()%>》" href="javascript:borrowRequest('<%=book.getId()%>','<%=book.getTitle()%>')">
+						<a class="thumbnail by"  rel="<%=book.getTitle()%>" bid="<%=book.getId()%>" title="借阅 《<%=book.getTitle()%>》" href="#">
 							<img src="<%=book.getMediumImg()%>" alt="<%=book.getTitle()%>" />
 						</a>
 						<a title="豆瓣书评" href="<%=book.getAlt()%>" target="blank">
 							豆瓣书评(可借阅)
 						</a>		
 						<%}else if(book.getStatus()!=Constants.BOOK_STATUS_FREE){ %>
-						<a class="thumbnail"  title="<%=book.getTitle()%>">
+						<a class="thumbnail bn" rel="<%=book.getTitle()%>" bid="<%=book.getId()%>" title="<%=book.getTitle()%>">
 							<img src="<%=book.getMediumImg()%>" alt="<%=book.getTitle()%>" />
 						</a>
 						<a title="豆瓣书评" href="<%=book.getAlt()%>" target="blank">
@@ -83,5 +85,4 @@
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/MarkerTool_min.js"></script>
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/map.js"></script>
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/index.js"></script>
-	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/common.js"></script>
 </html>

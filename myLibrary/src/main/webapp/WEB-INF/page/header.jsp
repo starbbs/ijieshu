@@ -24,14 +24,14 @@
                     <li class="">
                     <div class="input-append">
                         <input class="span3"  id="globalQuery" type="text" placeholder="搜索您想要的书">
-                        <button id="globalSearchBtn" onclick="javascript:searchGlobalBook($('#globalQuery').val());" type="submit" class="btn btn-primary">搜书</button>
+                        <button id="globalSearchBtn" onclick="javascript:iS.searchGlobalBook($('#globalQuery').val());" type="submit" class="btn btn-primary">搜书</button>
                     </div>
                     </li>
                     <li id="nameLabel" class="" >
                     <a id="nickLabel" title="点击修改昵称" style="color:#3A5FCD;" onclick="$(nameInput).show();$(nameLabel).hide();$(nick).focus();">欢迎馆君,<%=userInfo.getNick()%></a>
                     </li>              
                     <li id="nameInput" style="display:none;" >
-                    <span><input id="nick" title="点击修改昵称" type="text" onblur="inputBlur();" value="<%=userInfo.getNick()%>" style="color:#3A5FCD;margin:4px 0 2px 0px;" /></span>
+                    <span><input id="nick" title="点击修改昵称" type="text" onblur="iS.inputBlur();" value="<%=userInfo.getNick()%>" style="color:#3A5FCD;margin:4px 0 2px 0px;" /></span>
                     </li>         
                     <li class="">
                     <a href="/user/loginOut">退出</a>
@@ -43,7 +43,7 @@
                     <li class="">
                     <div class="input-append">
                         <input class="span2"  id="globalQuery" type="text" placeholder="搜索您想要的书">
-                        <button id="globalSearchBtn" onclick="javascript:searchGlobalBook($('#globalQuery').val());" type="submit" class="btn btn-primary">搜书</button>
+                        <button id="globalSearchBtn" onclick="javascript:iS.searchGlobalBook($('#globalQuery').val());" type="submit" class="btn btn-primary">搜书</button>
                     </div>
                     </li>                         
                     <li class="">
@@ -72,4 +72,5 @@
 </div>
 <div id="search_to_pop_up"></div>
 <script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/j.js"></script> 
+<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/jquery.form.js"></script> 
 <script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/header.js"></script>
