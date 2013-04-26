@@ -83,4 +83,5 @@
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/MarkerTool_min.js"></script>
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/map.js"></script>
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/index.js"></script>
+	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/common.js"></script>
 </html>
