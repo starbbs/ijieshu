@@ -50,6 +50,7 @@
 			<div  class="container-fluid" style="padding-top:40px;">
 				<fieldset>
 					<legend>新书上架</legend>
+					<div class="bookcontainer">
 					<%for(BookVo book : bookList){
 					%>
 					<div class="bookspan2" style="width: 120px;">
@@ -70,6 +71,7 @@
 						<%}%>		
 					</div>
 					<%}%>
+					</div>
 				</fieldset>
 			</div>
 		</div>

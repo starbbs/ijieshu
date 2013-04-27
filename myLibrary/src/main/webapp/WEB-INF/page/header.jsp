@@ -21,7 +21,7 @@
                     <li class="<%=myMessage%>">
                     <a href="/user/myLend">代书板</a>
                     </li>
-                    <li class="">
+                    <li class="navli">
                     <div class="input-append">
                         <input class="span3"  id="globalQuery" type="text" placeholder="搜索您想要的书">
                         <button id="globalSearchBtn" onclick="javascript:iS.searchGlobalBook($('#globalQuery').val());" type="submit" class="btn btn-primary">搜书</button>
