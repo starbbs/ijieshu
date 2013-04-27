@@ -40,13 +40,13 @@
                     <li class="<%=myLibrary%>">
                     <a href="/user/mylibrary">藏书阁</a>
                     </li>     
-                    <li class="">
+                    <li class="navli">
                     <div class="input-append">
                         <input class="span2"  id="globalQuery" type="text" placeholder="搜索您想要的书">
                         <button id="globalSearchBtn" onclick="javascript:iS.searchGlobalBook($('#globalQuery').val());" type="submit" class="btn btn-primary">搜书</button>
                     </div>
                     </li>                         
-                    <li class="">
+                    <li class="navli last">
                     <form  id="login" name="login" action="/user/userLogin"  method="post">        	             
                         <div class="input-append">
                             <input id="loginPassport" class="span3" type="email" required name="passport" placeholder="账号">			
