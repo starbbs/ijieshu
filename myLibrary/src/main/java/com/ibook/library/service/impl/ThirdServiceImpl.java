@@ -2,11 +2,12 @@ package com.ibook.library.service.impl;
 
 import java.util.List;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 import com.ibook.library.entity.Book;
 import com.ibook.library.service.ThirdService;
@@ -29,7 +30,8 @@ public class ThirdServiceImpl implements ThirdService {
         
         Book book =new Book();
         try {
-            JSONObject result = new JSONObject(bookStr);
+            JSONObject  result= new JSONObject();
+            result=result.getJSONObject(bookStr);
             book.setAlt(result.getString("alt"));
             book.setAltTitle(result.getString("alt_title"));
             book.setAuthor(result.getString("author"));
