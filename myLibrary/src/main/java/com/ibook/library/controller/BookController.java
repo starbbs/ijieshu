@@ -7,14 +7,15 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 import com.ibook.library.cst.Constants;
 import com.ibook.library.service.CacheService;
@@ -96,7 +97,7 @@ public class BookController extends BaseController{
                 obj.put("status", bookVo.getStatus());
                 obj.put("mediumImg", bookVo.getMediumImg());
                 obj.put("alt", bookVo.getAlt());
-                array.put(obj);
+                array.add(obj);
             }
             result.put(Constants.STATUS, 1);
             result.put(Constants.MSG, "【查询成功】");
