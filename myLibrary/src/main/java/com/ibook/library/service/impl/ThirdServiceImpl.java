@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
@@ -57,10 +58,10 @@ public class ThirdServiceImpl implements ThirdService {
             book.setPubdate(result.getString("pubdate"));
             book.setPublisher(result.getString("publisher"));
             book.setSubTitle(result.getString("subtitle"));
-            book.setSummary("");
+            book.setSummary(StringUtil.subString(result.getString("summary"), 512));
             
-//            JSONArray tags=result.getJSONArray("tags");
-            book.setTags("");
+            JSONArray tags=result.getJSONArray("tags");
+            book.setTags(tags.toString());
             book.setTranslator(result.getString("translator"));
             book.setTitle(result.getString("title"));
             book.setUrl(result.getString("url"));

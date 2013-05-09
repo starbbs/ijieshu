@@ -20,6 +20,7 @@ import com.ibook.library.dao.LibraryDao;
 import com.ibook.library.entity.Book;
 import com.ibook.library.entity.Library;
 import com.ibook.library.entity.LibraryBook;
+import com.ibook.library.entity.PresentBookLog;
 import com.ibook.library.entity.UserBookLog;
 import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
@@ -1012,5 +1013,11 @@ public class CacheServiceImpl implements CacheService {
         }catch (Exception e) {
             logger.error("memcached exception,putLibraryCount cacheKey:"+cacheKey, e);
         }
+    }
+
+    @Override
+    public boolean savePresentBookLog(PresentBookLog presentBookLog) {
+        // TODO Auto-generated method stub
+        return libraryDao.savePresentBookLog(presentBookLog);
     }
 }

@@ -17,6 +17,7 @@ import com.ibook.library.cst.Constants;
 import com.ibook.library.entity.Book;
 import com.ibook.library.entity.Library;
 import com.ibook.library.entity.LibraryBook;
+import com.ibook.library.entity.PresentBookLog;
 import com.ibook.library.entity.UserBookLog;
 import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
@@ -94,6 +95,7 @@ public class LibraryServiceImpl implements LibraryService {
     public Book saveBook(int userId,String identity) {
         Book book=thirdService.getBookFromDouban(identity);
         book.setOwnerUserId(userId);
+        book.setUploadUserId(userId);
         book.setStatus(Constants.BOOK_STATUS_FREE);
         book=cacheService.saveBook(book);
         if(null!=book){
@@ -283,10 +285,10 @@ public class LibraryServiceImpl implements LibraryService {
 
     public boolean revertBook(int userId, int logId) {
         UserBookLog userBookLog=cacheService.getUserBookLog(logId);
-        if(null==userBookLog){
+        if(null==userBookLog || userBookLog.getOwnerUserId()!=userId){
             return false;
         }
-        userBookLog.setStatus(Constants.BOOK_LOG_STATUS_DONE);
+        userBookLog.setStatus(Constants.BOOK_LOG_STATUS_REVERT);
         boolean flag=cacheService.updateUserBookLog(userBookLog);//更新借阅记录为已归还
         if(!flag){
             logger.error("revertBook ERROR,更新借阅记录失败");
@@ -306,6 +308,94 @@ public class LibraryServiceImpl implements LibraryService {
         return cacheService.unLockLibraryBook(userBookLog.getBookId());//图书馆的书同步解锁;
     }
 
+    public boolean approveBorrowBook(int userId, int logId) {
+        UserBookLog userBookLog=cacheService.getUserBookLog(logId);
+        if(null==userBookLog || userBookLog.getOwnerUserId()!=userId){
+            return false;
+        }
+        userBookLog.setStatus(Constants.BOOK_LOG_STATUS_BORROWED);
+        boolean flag=cacheService.updateUserBookLog(userBookLog);//更新借阅记录为已借出
+        if(!flag){
+            logger.error("approveBorrowBook ERROR,更新借阅记录失败");
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean rejectBorrowBook(int userId, int logId) {
+        UserBookLog userBookLog=cacheService.getUserBookLog(logId);
+        if(null==userBookLog || userBookLog.getOwnerUserId()!=userId){
+            return false;
+        }
+        userBookLog.setStatus(Constants.BOOK_LOG_STATUS_REJECT);
+        boolean flag=cacheService.updateUserBookLog(userBookLog);//更新借阅记录为拒绝借出
+        if(!flag){
+            logger.error("rejectBorrowBook ERROR,更新借阅记录失败");
+            return false;
+        }
+        Book book=cacheService.getBook(userBookLog.getBookId());
+        if(null==book){
+            logger.error("rejectBorrowBook ERROR,查找图书失败");
+            return false;
+        }
+        book.setStatus(Constants.BOOK_STATUS_FREE);//解锁该书
+        flag=cacheService.updateBook(book);
+        if(!flag){
+            logger.error("rejectBorrowBook ERROR,图书解锁失败");
+            return false;
+        }
+        return cacheService.unLockLibraryBook(userBookLog.getBookId());//图书馆的书同步解锁;
+    }
+    
+    public boolean appraiseTheBorrowed(int userId,int logId,int reliable) {
+        UserBookLog userBookLog=cacheService.getUserBookLog(logId);
+        if(null==userBookLog || userBookLog.getOwnerUserId()!=userId){
+            return false;
+        }
+        userBookLog.setBorrowReliable(reliable);
+        boolean flag=cacheService.updateUserBookLog(userBookLog);//更新借阅记录为拒绝借出
+        if(!flag){
+            logger.error("rejectBorrowBook ERROR,更新借阅记录失败");
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean presentBook(int userId, int logId) {
+        UserBookLog userBookLog=cacheService.getUserBookLog(logId);
+        if(null==userBookLog || userBookLog.getOwnerUserId()!=userId){
+            return false;
+        }
+        userBookLog.setStatus(Constants.BOOK_LOG_STATUS_PRESENTED);
+        boolean flag=cacheService.updateUserBookLog(userBookLog);//更新借阅记录为已赠送
+        if(!flag){
+            logger.error("presentBook ERROR,更新借阅记录失败");
+            return false;
+        }
+        Book book=cacheService.getBook(userBookLog.getBookId());
+        if(null==book){
+            logger.error("presentBook ERROR,查找图书失败");
+            return false;
+        }
+        
+        PresentBookLog presentBookLog=new PresentBookLog();
+        presentBookLog.setFromUserId(book.getOwnerUserId());
+        presentBookLog.setToUserId(book.getBorrowUserId());
+        flag=cacheService.savePresentBookLog(presentBookLog);
+        if(!flag){
+            logger.error("presentBook ERROR,图书赠送失败");
+            return false;
+        }
+        book.setStatus(Constants.BOOK_STATUS_FREE);//解锁该书
+        book.setOwnerUserId(book.getBorrowUserId());
+        flag=cacheService.updateBook(book);
+        if(!flag){
+            logger.error("presentBook ERROR,图书解锁失败");
+            return false;
+        }
+        return cacheService.unLockLibraryBook(userBookLog.getBookId());//图书馆的书同步解锁;
+    }
+    
     public boolean quitLibrary(int userLibraryId,int libraryId,int userId) {
         boolean flag=cacheService.deleteUserLibrary(userLibraryId,userId);//删除用户加入的图书馆记录
         if(!flag){

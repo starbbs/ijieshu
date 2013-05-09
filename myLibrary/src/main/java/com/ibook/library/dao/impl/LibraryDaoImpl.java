@@ -22,6 +22,7 @@ import com.ibook.library.dao.LibraryDao;
 import com.ibook.library.entity.Book;
 import com.ibook.library.entity.Library;
 import com.ibook.library.entity.LibraryBook;
+import com.ibook.library.entity.PresentBookLog;
 import com.ibook.library.entity.UserBookLog;
 import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
@@ -875,6 +876,19 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
         }
         logger.info("getLibraryCount SUCCESS time:"+(System.currentTimeMillis() - startTime));
         return count;
+    }
+
+    @Override
+    public boolean savePresentBookLog(PresentBookLog presentBookLog) {
+        long startTime = System.currentTimeMillis();
+        try {
+            save(presentBookLog);
+            logger.info("savePresentBookLog SUCCESS time:"+(System.currentTimeMillis() - startTime));
+        }catch(Exception e) {
+            logger.error("savePresentBookLog ERROR"+e);
+            return false;
+        }
+        return true;
     }
 
 }

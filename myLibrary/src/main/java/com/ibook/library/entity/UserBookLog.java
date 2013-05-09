@@ -55,7 +55,7 @@ public class UserBookLog implements Serializable{
     @Column(name = "borrow_reliable")
     private int borrowReliable;
     
-    /**0-申请中，1-待归还，2-完成**/
+    /**0-申请中，1-已借阅，2-已归还，3-已赠送**/
     @Column(name = "status")
     private int status;
     

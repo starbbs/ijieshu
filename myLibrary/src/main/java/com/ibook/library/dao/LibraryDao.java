@@ -6,6 +6,7 @@ import java.util.Set;
 import com.ibook.library.entity.Book;
 import com.ibook.library.entity.Library;
 import com.ibook.library.entity.LibraryBook;
+import com.ibook.library.entity.PresentBookLog;
 import com.ibook.library.entity.UserBookLog;
 import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
@@ -89,4 +90,5 @@ public interface LibraryDao {
     
     public int getLibraryUserCount(int libraryId);
     
+    public boolean savePresentBookLog(PresentBookLog presentBookLog);
 }

@@ -121,6 +121,10 @@ public class Book implements Serializable {
     @Column(name = "owner_user_id")
     private int ownerUserId;
 
+    /** 上传者 **/
+    @Column(name = "upload_user_id")
+    private int  uploadUserId;
+    
     /** 借阅者 **/
     @Column(name = "borrow_user_Id")
     private int borrowUserId;
@@ -335,6 +339,14 @@ public class Book implements Serializable {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public int getUploadUserId() {
+        return uploadUserId;
+    }
+
+    public void setUploadUserId(int uploadUserId) {
+        this.uploadUserId = uploadUserId;
     }
 
 }

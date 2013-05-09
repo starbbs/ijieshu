@@ -47,6 +47,10 @@ public class UserInfo implements Serializable{
     /** 头像 **/
     @Column(name = "img")
     private String img;
+
+    /** 给借阅者的默认message **/
+    @Column(name = "message")
+    private String message;
     
     public int getId() {
         return id;

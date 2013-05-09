@@ -729,4 +729,259 @@ public class UserController extends BaseController {
             getJson(request, response, callback, result.toString());
         }
     }
+    
+    /**
+     * 同意图书借出
+     * 
+     * @throws IOException
+     */
+    @RequestMapping(value = "/user/approveBorrowBook")
+    public void approveBorrowBook(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+        try {
+            UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
+            if(null==userInfo){
+                return ;
+            }
+            JSONObject result = new JSONObject();
+            // 解决跨域
+            String callback = request.getParameter("callback");
+            String logId = "";
+            if (request.getParameter("id") != null) {
+                logId = request.getParameter("id");
+            }
+            if (StringUtil.isEmpty(logId)) {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借书记录id为空】悟空你又调皮了-_-");
+                getJson(request, response, callback, result.toString());
+                return;
+            }
+
+            boolean flag=libraryService.approveBorrowBook(userInfo.getId(), Integer.valueOf(logId));
+            if(flag){
+                result.put(Constants.STATUS, 1);
+                result.put(Constants.MSG, "【图书同意借出】遇见一位爱书之人,美哉!");
+                getJson(request, response, callback, result.toString());
+            }else{
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借出状态更新又罢工啦】我错了,原谅我吧!");
+                getJson(request, response, callback, result.toString());
+            }
+        } catch (Exception e) {
+            logger.error("借出状态更新异常 " + e);
+            String callback = request.getParameter("callback");
+            JSONObject result = new JSONObject();
+            try {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "靠,服务歇菜了!");
+            } catch (JSONException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            getJson(request, response, callback, result.toString());
+        }
+    }
+    
+    /**
+     * 拒绝图书借出
+     * 
+     * @throws IOException
+     */
+    @RequestMapping(value = "/user/rejectBorrowBook")
+    public void rejectBorrowBook(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+        try {
+            UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
+            if(null==userInfo){
+                return ;
+            }
+            JSONObject result = new JSONObject();
+            // 解决跨域
+            String callback = request.getParameter("callback");
+            String logId = "";
+            if (request.getParameter("id") != null) {
+                logId = request.getParameter("id");
+            }
+            if (StringUtil.isEmpty(logId)) {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借书记录id为空】悟空你又调皮了-_-");
+                getJson(request, response, callback, result.toString());
+                return;
+            }
+
+            boolean flag=libraryService.rejectBorrowBook(userInfo.getId(), Integer.valueOf(logId));
+            if(flag){
+                result.put(Constants.STATUS, 1);
+                result.put(Constants.MSG, "【图书拒绝借出】");
+                getJson(request, response, callback, result.toString());
+            }else{
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借出状态更新又罢工啦】我错了,原谅我吧!");
+                getJson(request, response, callback, result.toString());
+            }
+        } catch (Exception e) {
+            logger.error("借出状态更新异常 " + e);
+            String callback = request.getParameter("callback");
+            JSONObject result = new JSONObject();
+            try {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "靠,服务歇菜了!");
+            } catch (JSONException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            getJson(request, response, callback, result.toString());
+        }
+    }
+    
+    /**
+     * 赠送图书
+     * 
+     * @throws IOException
+     */
+    @RequestMapping(value = "/user/presentBook")
+    public void presentBook(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+        try {
+            UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
+            if(null==userInfo){
+                return ;
+            }
+            JSONObject result = new JSONObject();
+            // 解决跨域
+            String callback = request.getParameter("callback");
+            String logId = "";
+            if (request.getParameter("id") != null) {
+                logId = request.getParameter("id");
+            }
+            if (StringUtil.isEmpty(logId)) {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借书记录id为空】悟空你又调皮了-_-");
+                getJson(request, response, callback, result.toString());
+                return;
+            }
+
+            boolean flag=libraryService.presentBook(userInfo.getId(), Integer.valueOf(logId));
+            if(flag){
+                result.put(Constants.STATUS, 1);
+                result.put(Constants.MSG, "【图书已赠送成功】遇见一位爱书之人,美哉!");
+                getJson(request, response, callback, result.toString());
+            }else{
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借出状态更新又罢工啦】我错了,原谅我吧!");
+                getJson(request, response, callback, result.toString());
+            }
+        } catch (Exception e) {
+            logger.error("借出状态更新异常 " + e);
+            String callback = request.getParameter("callback");
+            JSONObject result = new JSONObject();
+            try {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "靠,服务歇菜了!");
+            } catch (JSONException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            getJson(request, response, callback, result.toString());
+        }
+    }
+    
+    /**
+     * 对借阅者差评
+     * 
+     * @throws IOException
+     */
+    @RequestMapping(value = "/user/appraiseBad")
+    public void appraiseBad(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+        try {
+            UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
+            if(null==userInfo){
+                return ;
+            }
+            JSONObject result = new JSONObject();
+            // 解决跨域
+            String callback = request.getParameter("callback");
+            String logId = "";
+            if (request.getParameter("id") != null) {
+                logId = request.getParameter("id");
+            }
+            if (StringUtil.isEmpty(logId)) {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借书记录id为空】悟空你又调皮了-_-");
+                getJson(request, response, callback, result.toString());
+                return;
+            }
+
+            boolean flag=libraryService.appraiseTheBorrowed(userInfo.getId(), Integer.valueOf(logId),Constants.RELIABLE_STATUS_NO);
+            if(flag){
+                result.put(Constants.STATUS, 1);
+                result.put(Constants.MSG, "【给了对方一个不靠评价】");
+                getJson(request, response, callback, result.toString());
+            }else{
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借出状态更新又罢工啦】我错了,原谅我吧!");
+                getJson(request, response, callback, result.toString());
+            }
+        } catch (Exception e) {
+            logger.error("借出状态更新异常 " + e);
+            String callback = request.getParameter("callback");
+            JSONObject result = new JSONObject();
+            try {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "靠,服务歇菜了!");
+            } catch (JSONException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            getJson(request, response, callback, result.toString());
+        }
+    }
+    
+    /**
+     * 对借阅者好评
+     * 
+     * @throws IOException
+     */
+    @RequestMapping(value = "/user/appraiseGood")
+    public void appraiseGood(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+        try {
+            UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
+            if(null==userInfo){
+                return ;
+            }
+            JSONObject result = new JSONObject();
+            // 解决跨域
+            String callback = request.getParameter("callback");
+            String logId = "";
+            if (request.getParameter("id") != null) {
+                logId = request.getParameter("id");
+            }
+            if (StringUtil.isEmpty(logId)) {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借书记录id为空】悟空你又调皮了-_-");
+                getJson(request, response, callback, result.toString());
+                return;
+            }
+
+            boolean flag=libraryService.appraiseTheBorrowed(userInfo.getId(), Integer.valueOf(logId),Constants.RELIABLE_STATUS_YES);
+            if(flag){
+                result.put(Constants.STATUS, 1);
+                result.put(Constants.MSG, "【给了对方一个靠谱评价】遇见一位爱书之人,美哉!");
+                getJson(request, response, callback, result.toString());
+            }else{
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借出状态更新又罢工啦】我错了,原谅我吧!");
+                getJson(request, response, callback, result.toString());
+            }
+        } catch (Exception e) {
+            logger.error("借出状态更新异常 " + e);
+            String callback = request.getParameter("callback");
+            JSONObject result = new JSONObject();
+            try {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "靠,服务歇菜了!");
+            } catch (JSONException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            getJson(request, response, callback, result.toString());
+        }
+    }
 }

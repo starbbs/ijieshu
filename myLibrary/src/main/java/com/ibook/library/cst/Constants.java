@@ -41,10 +41,14 @@ public class Constants {
     
     /**0-申请中**/
     public static final int BOOK_LOG_STATUS_APPLY=0;
-    /**1-待归还**/
+    /**1-已借阅**/
     public static final int BOOK_LOG_STATUS_BORROWED=1;
-    /**2-借阅完成**/
-    public static final int BOOK_LOG_STATUS_DONE=2;
+    /**2-已拒绝**/
+    public static final int BOOK_LOG_STATUS_REJECT=2;
+    /**3-已归还**/
+    public static final int BOOK_LOG_STATUS_REVERT=3;
+    /**4-已赠送**/
+    public static final int BOOK_LOG_STATUS_PRESENTED=4;
     
     /**0-发送消息方**/
     public static final int MESSAGE_DIRECTION_FROM=0;
