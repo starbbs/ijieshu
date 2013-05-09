@@ -107,7 +107,70 @@ public class UserController extends BaseController {
      * @throws IOException
      */
     @RequestMapping(value = "/user/userLogin")
-    public String userLogin(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    public void userLogin(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+        try {
+            JSONObject result = new JSONObject();
+            // 解决跨域
+            String callback = request.getParameter("callback");
+            String passport = "";
+            String password = "";
+            if (request.getParameter("passport") != null) {
+                passport = request.getParameter("passport");
+            }
+            if (request.getParameter("password") != null) {
+                password = request.getParameter("password");
+            }
+            if (StringUtil.isEmpty(passport) || StringUtil.isEmpty(password)) {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【账号或密码不能为空】悟空你又调皮了-_-");
+                getJson(request, response, callback, result.toString());
+                return;
+            }
+            UserInfo userInfo = cacheService.getUserInfo(passport);
+            if (null == userInfo) {
+                userInfo = cacheService.saveUserInfo(passport, MD5.getMD5Str(password));
+                if (null == userInfo) {
+                    result.put(Constants.STATUS, -1);
+                    result.put(Constants.MSG, "【注册失败】我们关心的，不是你是否失败了，而是你对失败能否无怨!");
+                    getJson(request, response, callback, result.toString());
+                    return;
+                }
+            }
+            if (!MD5.getMD5Str(password).equals(userInfo.getPassword())) {
+                logger.info("密码错误");
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【密码错误】圣杯在古老的玫瑰林下面等待!");
+                getJson(request, response, callback, result.toString());
+                return;
+            }
+            // 登录成功
+            putUserGlobal(request, response, passport);
+            result= JSONObject.fromObject(userInfo);
+            result.put(Constants.STATUS, 1);
+            result.put(Constants.MSG, "【登录成功】!");
+            getJson(request, response, callback, result.toString());
+        } catch (Exception e) {
+            logger.error("用户登录异常 " + e);
+            String callback = request.getParameter("callback");
+            JSONObject result = new JSONObject();
+            try {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "靠,服务歇菜了!");
+            } catch (JSONException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            getJson(request, response, callback, result.toString());
+        }
+    }
+
+    /**
+     * 用户登录
+     * 
+     * @throws IOException
+     */
+    @RequestMapping(value = "/user/login")
+    public String login(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
         try {
             JSONObject result = new JSONObject();
             // 解决跨域
@@ -163,7 +226,7 @@ public class UserController extends BaseController {
         }
         return "forward:/user/index";
     }
-
+    
     /**
      * 用户退出
      * 
