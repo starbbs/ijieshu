@@ -147,6 +147,7 @@ public class UserController extends BaseController {
             putUserGlobal(request, response, passport);
             result= JSONObject.fromObject(userInfo);
             result.put(Constants.STATUS, 1);
+            result.put("password", "");
             result.put(Constants.MSG, "【登录成功】!");
             getJson(request, response, callback, result.toString());
         } catch (Exception e) {
@@ -491,7 +492,7 @@ public class UserController extends BaseController {
                 getJson(request, response, callback, result.toString());
                 return;
             }
-            Book book=libraryService.saveBook(userInfo.getId(), identity);
+            Book book=libraryService.saveBook(userInfo.getId(),userInfo.getPassport(), identity);
             if(null==book){
                 result.put(Constants.STATUS, -1);
                 result.put(Constants.MSG, "【图书添加失败】亲爱的,我错了,原谅我吧!");
@@ -551,7 +552,7 @@ public class UserController extends BaseController {
                 getJson(request, response, callback, result.toString());
                 return;
             }
-            boolean flag=libraryService.saveBorrowBookRequest(userInfo.getId(),Integer.valueOf(bookId), msg);
+            boolean flag=libraryService.saveBorrowBookRequest(userInfo.getId(),userInfo.getPassport(),userInfo.getBorrowedLimit(),Integer.valueOf(bookId), msg);
             if(flag){
                 result.put(Constants.STATUS, 1);
                 result.put(Constants.MSG, "【申请成功】代书板可以查看申请哦！");

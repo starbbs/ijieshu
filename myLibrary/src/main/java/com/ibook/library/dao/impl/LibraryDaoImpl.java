@@ -539,9 +539,11 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
                 userBookLog.setBorrowReliable(rs.getInt("borrow_reliable"));
                 userBookLog.setBorrowTalk(rs.getString("borrow_talk"));
                 userBookLog.setBorrowUserId(rs.getInt("borrow_user_id"));
+                userBookLog.setBorrowPassport(rs.getString("borrow_passport"));
                 userBookLog.setOwneReliable(rs.getInt("owner_reliable"));
                 userBookLog.setOwnerTalk(rs.getString("owner_talk"));
                 userBookLog.setOwnerUserId(rs.getInt("owner_user_id"));
+                userBookLog.setOwnerPassport(rs.getString("owner_passport"));
                 userBookLog.setStatus(rs.getInt("status"));
                 list.add(userBookLog);
             }

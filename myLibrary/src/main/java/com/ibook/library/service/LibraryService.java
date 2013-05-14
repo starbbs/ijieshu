@@ -16,7 +16,7 @@ public interface LibraryService {
 
     public List<UserLibraryVo> getUserLibraryList(int userId);
 
-    public Book saveBook(int userId, String identity);
+    public Book saveBook(int userId,String passport, String identity);
 
     public List<Book> getBookList(int userId);
 
@@ -34,7 +34,7 @@ public interface LibraryService {
      * @param msg
      * @return
      */
-    public boolean saveBorrowBookRequest(int userId, int bookId, String msg);
+    public boolean saveBorrowBookRequest(int userId,String passport,int borrowedLimit, int bookId, String msg);
 
     /**
      * 同意图书借出
@@ -91,4 +91,19 @@ public interface LibraryService {
     public int getLibraryCount();
     
     public int getBookCount();
+    
+    /**
+     * 增加用户借阅图书数量的上限
+     * @param passport
+     * @return
+     */
+    public boolean incrUserBorrowedLimit(String passport);
+    
+    /**
+     * 减小用户借阅图书数量的上限
+     * @param passport
+     * @return
+     */
+    public boolean decrUserBorrowedLimit(String passport);
+
 }

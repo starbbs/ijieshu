@@ -121,14 +121,26 @@ public class Book implements Serializable {
     @Column(name = "owner_user_id")
     private int ownerUserId;
 
+    /** 拥有者passport **/
+    @Column(name = "owner_passport")
+    private String ownerPassport;
+    
     /** 上传者 **/
     @Column(name = "upload_user_id")
     private int  uploadUserId;
     
+    /** 上传者passport **/
+    @Column(name = "upload_passport")
+    private String uploadPassport;
+    
     /** 借阅者 **/
     @Column(name = "borrow_user_Id")
     private int borrowUserId;
-
+    
+    /** 借阅者passport **/
+    @Column(name = "borrow_passport")
+    private String borrowPassport;
+    
     /**0-自由的书，1-锁定的书，2-私人的书**/
     @Column(name = "status")
     private int status;
@@ -347,6 +359,30 @@ public class Book implements Serializable {
 
     public void setUploadUserId(int uploadUserId) {
         this.uploadUserId = uploadUserId;
+    }
+
+    public String getOwnerPassport() {
+        return ownerPassport;
+    }
+
+    public void setOwnerPassport(String ownerPassport) {
+        this.ownerPassport = ownerPassport;
+    }
+
+    public String getUploadPassport() {
+        return uploadPassport;
+    }
+
+    public void setUploadPassport(String uploadPassport) {
+        this.uploadPassport = uploadPassport;
+    }
+
+    public String getBorrowPassport() {
+        return borrowPassport;
+    }
+
+    public void setBorrowPassport(String borrowPassport) {
+        this.borrowPassport = borrowPassport;
     }
 
 }

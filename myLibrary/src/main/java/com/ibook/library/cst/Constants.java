@@ -62,6 +62,9 @@ public class Constants {
     /**2-不靠谱-借书动作评价**/
     public static final int RELIABLE_STATUS_NO=2;
     
+    /**2-最多同时可以借阅图书数量**/
+    public static final int MAX_BORROWED_LIMIT=2;
+    
     /**json返回常量-状态**/
     public static final String STATUS="status";
     /**json返回常量-消息**/

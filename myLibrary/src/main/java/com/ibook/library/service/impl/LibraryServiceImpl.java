@@ -92,10 +92,12 @@ public class LibraryServiceImpl implements LibraryService {
         return voList;
     }
 
-    public Book saveBook(int userId,String identity) {
+    public Book saveBook(int userId,String passport,String identity) {
         Book book=thirdService.getBookFromDouban(identity);
         book.setOwnerUserId(userId);
         book.setUploadUserId(userId);
+        book.setOwnerPassport(passport);
+        book.setUploadPassport(passport);
         book.setStatus(Constants.BOOK_STATUS_FREE);
         book=cacheService.saveBook(book);
         if(null!=book){
@@ -192,7 +194,10 @@ public class LibraryServiceImpl implements LibraryService {
         });
     }
 
-    public boolean saveBorrowBookRequest(int userId,int bookId, String msg) {
+    public boolean saveBorrowBookRequest(int userId,String passport,int borrowedLimit,int bookId, String msg) {
+        if(borrowedLimit>=Constants.MAX_BORROWED_LIMIT){
+            return false;
+        }
         Book book=cacheService.getBook(bookId);
         if(null==book ||book.getStatus()!=Constants.BOOK_STATUS_FREE){
             return false;
@@ -202,6 +207,8 @@ public class LibraryServiceImpl implements LibraryService {
         userBookLog.setBookId(book.getId());
         userBookLog.setBorrowUserId(userId);
         userBookLog.setOwnerUserId(book.getOwnerUserId());
+        userBookLog.setOwnerPassport(book.getOwnerPassport());
+        userBookLog.setBorrowPassport(passport);
         userBookLog.setStatus(Constants.BOOK_LOG_STATUS_APPLY);
         userBookLog=cacheService.saveUserBookLog(userBookLog);
         if(null==userBookLog){
@@ -216,7 +223,10 @@ public class LibraryServiceImpl implements LibraryService {
         if(null==userMessage){
             return false;
         }
+        this.decrUserBorrowedLimit(userBookLog.getBorrowPassport());
         cacheService.lockLibraryBook(bookId);//图书馆的书同步锁定
+        book.setBorrowPassport(passport);
+        book.setBorrowUserId(userId);
         book.setStatus(Constants.BOOK_STATUS_LOCK);//锁定这本书
         return cacheService.updateBook(book);
     }
@@ -305,6 +315,7 @@ public class LibraryServiceImpl implements LibraryService {
             logger.error("revertBook ERROR,图书解锁失败");
             return false;
         }
+        this.incrUserBorrowedLimit(userBookLog.getBorrowPassport());
         return cacheService.unLockLibraryBook(userBookLog.getBookId());//图书馆的书同步解锁;
     }
 
@@ -344,6 +355,7 @@ public class LibraryServiceImpl implements LibraryService {
             logger.error("rejectBorrowBook ERROR,图书解锁失败");
             return false;
         }
+        this.incrUserBorrowedLimit(userBookLog.getBorrowPassport());
         return cacheService.unLockLibraryBook(userBookLog.getBookId());//图书馆的书同步解锁;
     }
     
@@ -393,6 +405,7 @@ public class LibraryServiceImpl implements LibraryService {
             logger.error("presentBook ERROR,图书解锁失败");
             return false;
         }
+        this.incrUserBorrowedLimit(userBookLog.getBorrowPassport());
         return cacheService.unLockLibraryBook(userBookLog.getBookId());//图书馆的书同步解锁;
     }
     
@@ -443,5 +456,27 @@ public class LibraryServiceImpl implements LibraryService {
     @Override
     public int getBookCount() {
         return cacheService.getBookCount();
+    }
+
+    @Override
+    public boolean incrUserBorrowedLimit(String passport) {
+        UserInfo userInfo=cacheService.getUserInfo(passport);
+        if(null==userInfo){
+            return false;   
+        }
+        userInfo.setBorrowedLimit(userInfo.getBorrowedLimit()+1);
+        boolean flag=cacheService.updateUserInfo(userInfo);
+        return flag;
+    }
+
+    @Override
+    public boolean decrUserBorrowedLimit(String passport) {
+        UserInfo userInfo=cacheService.getUserInfo(passport);
+        if(null==userInfo){
+            return false;   
+        }
+        userInfo.setBorrowedLimit(userInfo.getBorrowedLimit()-1);
+        boolean flag=cacheService.updateUserInfo(userInfo);
+        return flag;
     }
 }

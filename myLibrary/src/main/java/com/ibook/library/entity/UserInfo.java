@@ -52,6 +52,10 @@ public class UserInfo implements Serializable{
     @Column(name = "message")
     private String message;
     
+    /** 可以借阅的书的总数 **/
+    @Column(name = "borrowed_limit")
+    private int borrowedLimit;
+    
     public int getId() {
         return id;
     }
@@ -87,6 +91,18 @@ public class UserInfo implements Serializable{
     }
     public void setImg(String img) {
         this.img = img;
+    }
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    public int getBorrowedLimit() {
+        return borrowedLimit;
+    }
+    public void setBorrowedLimit(int borrowedLimit) {
+        this.borrowedLimit = borrowedLimit;
     }
     
     

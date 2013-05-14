@@ -43,7 +43,7 @@ public class CacheServiceImpl implements CacheService {
     private static final int EXPIRE=60*60*24*2;//失效时间为2天
  
     /**失效时间常量一 1分钟**/
-    private static final int EXPIRE_1_MINUTE=60*60*24*2;//失效时间为1分钟
+    private static final int EXPIRE_1_MINUTE=60*60;//失效时间为1分钟
     
     public UserInfo getUserInfo(String passport) {
         String cacheKey = Constants.CACHE_KEY_USER_INFO +passport;
@@ -90,6 +90,7 @@ public class CacheServiceImpl implements CacheService {
         UserInfo userInfo=new UserInfo();
         userInfo.setPassport(passport);
         userInfo.setPassword(password);
+        userInfo.setBorrowedLimit(Constants.MAX_BORROWED_LIMIT);
         userInfo.setDescripiton("法国传奇美食家布里亚-萨瓦兰将自己跌宕起伏的一生化作美食奇谈，讲述美食背后的故事，所写的主题与人们的日常生活息息相关。");
         userInfo.setNick("厨房里的哲学家");
         userInfo.setImg("http://img3.douban.com/mpic/s24628502.jpg");

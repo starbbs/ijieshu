@@ -36,6 +36,10 @@ public class UserBookLog implements Serializable{
     @Column(name = "owner_user_id")
     private int ownerUserId;
     
+    /** 拥有者passport **/
+    @Column(name = "owner_passport")
+    private String ownerPassport;
+        
     /** 拥有者说说 **/
     @Column(name = "owner_talk")
     private String ownerTalk;
@@ -43,9 +47,14 @@ public class UserBookLog implements Serializable{
     /** 拥有者是否靠谱-借阅者评价 **/
     @Column(name = "owner_reliable")
     private int owneReliable;
+    
     /** 借阅者 **/
     @Column(name = "borrow_user_id")
     private int borrowUserId;
+    
+    /** 借阅者passport **/
+    @Column(name = "borrow_passport")
+    private String borrowPassport;
     
     /** 借阅者说说 **/
     @Column(name = "borrow_talk")
@@ -112,6 +121,18 @@ public class UserBookLog implements Serializable{
     }
     public void setBookId(int bookId) {
         this.bookId = bookId;
+    }
+    public String getOwnerPassport() {
+        return ownerPassport;
+    }
+    public void setOwnerPassport(String ownerPassport) {
+        this.ownerPassport = ownerPassport;
+    }
+    public String getBorrowPassport() {
+        return borrowPassport;
+    }
+    public void setBorrowPassport(String borrowPassport) {
+        this.borrowPassport = borrowPassport;
     } 
     
 }
