@@ -75,16 +75,23 @@
 				</fieldset>
 			</div>
 		</div>
-
-		<div id="element_to_pop_up"></div>
-		<%@include file="footer.html" %>
+	<%@include file="footer.html" %>
+		
+	<div id="myModal" class="modal hide fade">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-hidden="true">&times;</button>
+			<h3>借阅图书申请</h3>
+		</div>
+		<div class="modal-body"></div>
+	</div>
+	
 
 	</body>
 		
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/bootstrap.js"></script>
-	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/popup.js"></script>
 	<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.5&ak=0Ef9e97e70efac4cffa7359a61e9e8ad"></script>
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/MarkerTool_min.js"></script>
-	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/map.js"></script>
-	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/index.js"></script>
+	<script type="text/javascript" src="/js/map.js"></script>
+	<script type="text/javascript" src="/js/index.js"></script>
 </html>
