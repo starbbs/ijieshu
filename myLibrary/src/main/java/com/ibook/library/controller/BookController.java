@@ -59,7 +59,7 @@ public class BookController extends BaseController{
                 getJson(request, response, callback, result.toString());
                 return;
             }
-            String books=WebResourceReader.doGet("http://api.douban.com/v2/book/search?q="+URLEncoder.encode(query.trim(),"utf-8"));
+            String books=WebResourceReader.doGet("http://api.douban.com/v2/book/search?count=6&q="+URLEncoder.encode(query.trim(),"utf-8"));
             logger.info(query.trim()+":"+books);
             response.getWriter().print(books);
         } catch (Exception e) {

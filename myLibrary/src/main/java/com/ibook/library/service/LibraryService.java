@@ -76,7 +76,7 @@ public interface LibraryService {
      */
     public boolean appraiseTheBorrowed(int userId,int logId,int reliable);
     
-    public List<Library> getLibrarys(String query);
+    public List<Library> getLibrarys(String query,String city);
 
     public List<BookLogMessageVo> getBookLogMessageVos(int userId);
 

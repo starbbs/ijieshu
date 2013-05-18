@@ -88,5 +88,13 @@ public class UserLibrary implements Serializable {
         this.libraryDesc = libraryDesc;
     }
 
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
     
 }

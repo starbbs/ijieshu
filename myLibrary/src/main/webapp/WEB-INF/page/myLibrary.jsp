@@ -56,7 +56,7 @@
 						豆瓣书评(已外借)
 					</a>				
 					<%}else{ %>
-					<a class="thumbnail bn"  rel="<%=book.getTitle()%>" bid="<%=book.getId()%>"  title="<%=book.getTitle()%>">
+					<a class="thumbnail my"  rel="<%=book.getTitle()%>" bid="<%=book.getId()%>"  title="<%=book.getTitle()%>">
 						<img src="<%=book.getMediumImg()%>" alt="<%=book.getTitle()%>" />
 					</a>
 					<a title="豆瓣书评" href="<%=book.getAlt()%>" target="blank">
@@ -68,8 +68,17 @@
 			</div>
 		</div>
 
-		<div id="element_to_pop_up"></div>
 		<%@include file="footer.html" %>
+
+	<div id="myModal" class="modal hide fade">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-hidden="true">&times;</button>
+			<h3>借阅图书申请</h3>
+		</div>
+		<div class="modal-body"></div>
+	</div>
+		
 	</body>
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/bootstrap.js"></script>
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/popup.js"></script>

@@ -65,6 +65,7 @@ public class LibraryServiceImpl implements LibraryService {
             userLibrary.setLibraryName(library.getName());
             userLibrary.setLibraryDesc(library.getDesc());
             userLibrary.setUserId(userId);
+//            userLibrary.setNick(nick);
             userLibrary=cacheService.saveUserLibrary(userLibrary);
             if(null!=library &&null!=userLibrary){
                 //新增图书馆，同步更新用户的书存入图书馆
@@ -199,7 +200,7 @@ public class LibraryServiceImpl implements LibraryService {
             return false;
         }
         Book book=cacheService.getBook(bookId);
-        if(null==book ||book.getStatus()!=Constants.BOOK_STATUS_FREE){
+        if(null==book ||book.getStatus()!=Constants.BOOK_STATUS_FREE || userId==book.getOwnerUserId()){
             return false;
         }
         //保存借书申请记录
@@ -231,7 +232,7 @@ public class LibraryServiceImpl implements LibraryService {
         return cacheService.updateBook(book);
     }
 
-    public List<Library> getLibrarys(String query) {
+    public List<Library> getLibrarys(String query,String city) {
         return cacheService.getLibrarys(query);
     }
 

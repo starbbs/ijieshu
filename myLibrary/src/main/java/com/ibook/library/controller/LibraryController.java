@@ -343,14 +343,17 @@ public class LibraryController extends BaseController{
             if (request.getParameter("query") != null) {
                 query = request.getParameter("query");
             }
-
+            String city = "北京市";
+            if (request.getParameter("city") != null) {
+                city = request.getParameter("city");
+            }
             /*if (StringUtil.isEmpty(query)) {
                 result.put(Constants.STATUS, -1);
                 result.put(Constants.MSG, "【查询条件为空】悟空你又调皮了-_-");
                 getJson(request, response, callback, result.toString());
                 return;
             }*/
-            List<Library> list=libraryService.getLibrarys(query);
+            List<Library> list=libraryService.getLibrarys(query,city);
             for(Library library:list){
                 JSONObject obj = new JSONObject();
                 obj.put("id", library.getId());

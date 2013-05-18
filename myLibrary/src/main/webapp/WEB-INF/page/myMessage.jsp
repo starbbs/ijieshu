@@ -40,7 +40,7 @@
 
 			<div class="form-signin container-fluid">
 				<fieldset>
-					<legend>我借的书</legend>	
+					<legend>借入</legend>	
 					<div class="row-fluid">
 						<%for(BookLogMessageVo bookLogMessageVo : bookLogMessageVoList){
 						if(!bookLogMessageVo.isMyBook()){
@@ -66,7 +66,7 @@
 
 			<div class="form-signin container-fluid">
 				<fieldset>
-					<legend>借出的书</legend>
+					<legend>借出</legend>
 					<div class="row-fluid">	
 						<%for(BookLogMessageVo bookLogMessageVo : bookLogMessageVoList){
 						if(bookLogMessageVo.isMyBook()){

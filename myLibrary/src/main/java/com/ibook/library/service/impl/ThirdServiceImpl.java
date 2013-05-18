@@ -31,8 +31,7 @@ public class ThirdServiceImpl implements ThirdService {
         
         Book book =new Book();
         try {
-            JSONObject  result= new JSONObject();
-            result=result.getJSONObject(bookStr);
+            JSONObject  result=JSONObject.fromObject(bookStr);
             book.setAlt(result.getString("alt"));
             book.setAltTitle(result.getString("alt_title"));
             book.setAuthor(result.getString("author"));
@@ -61,7 +60,12 @@ public class ThirdServiceImpl implements ThirdService {
             book.setSummary(StringUtil.subString(result.getString("summary"), 512));
             
             JSONArray tags=result.getJSONArray("tags");
-            book.setTags(tags.toString());
+            String tag="";
+            for(int i=0;i<tags.size();i++){
+                JSONObject  obj=tags.getJSONObject(i);
+                tag=tag+";"+obj.getString("name");
+            }
+            book.setTags(tag);
             book.setTranslator(result.getString("translator"));
             book.setTitle(result.getString("title"));
             book.setUrl(result.getString("url"));
