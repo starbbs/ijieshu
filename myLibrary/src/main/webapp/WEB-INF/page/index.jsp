@@ -92,6 +92,6 @@
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/bootstrap.js"></script>
 	<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.5&ak=0Ef9e97e70efac4cffa7359a61e9e8ad"></script>
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/MarkerTool_min.js"></script>
-	<script type="text/javascript" src="/js/map.js"></script>
-	<script type="text/javascript" src="/js/index.js"></script>
+	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/map.js"></script>
+	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/index.js"></script>
 </html>
