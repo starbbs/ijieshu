@@ -6,6 +6,7 @@ import com.ibook.library.entity.Book;
 import com.ibook.library.entity.Library;
 import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
+import com.ibook.library.util.Page;
 import com.ibook.library.vo.BookLogMessageVo;
 import com.ibook.library.vo.BookVo;
 import com.ibook.library.vo.UserLibraryVo;
@@ -20,7 +21,7 @@ public interface LibraryService {
 
     public List<Book> getBookList(int userId);
 
-    public List<BookVo> getLibraryBookList(int userId, String query);
+    public Page<BookVo> getLibraryBookList(int userId, String query,Page<BookVo> page);
 
     public List<BookVo> getBookList(String query);
 

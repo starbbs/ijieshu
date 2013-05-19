@@ -22,6 +22,8 @@ import com.ibook.library.entity.Library;
 import com.ibook.library.entity.UserInfo;
 import com.ibook.library.service.CacheService;
 import com.ibook.library.service.LibraryService;
+import com.ibook.library.util.NumberUtil;
+import com.ibook.library.util.Page;
 import com.ibook.library.vo.BookLogMessageVo;
 import com.ibook.library.vo.BookVo;
 import com.ibook.library.vo.UserLibraryVo;
@@ -159,16 +161,29 @@ public class LibraryController extends BaseController{
     public String libraryBooks(final HttpServletRequest request, final HttpServletResponse response) {
         UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
         int userId=0;
+        int pageIndex=1;
+        int pageSize=21;
+        String query="";
+
         if(null!=userInfo){
             userId=userInfo.getId();
         }
-        String query="";
         if (request.getParameter("query") != null) {
             query = request.getParameter("query");
         }
-        List<BookVo> bookList=libraryService.getLibraryBookList(userId, query);
-        request.setAttribute("bookList", bookList);
+        if (request.getParameter("pageIndex") != null) {
+            pageIndex =  NumberUtil.getInt(request.getParameter("pageIndex"), 1);
+        }
+        if (request.getParameter("pageSize") != null) {
+            pageSize =  NumberUtil.getInt(request.getParameter("pageSize"), 21);
+        }
+        Page<BookVo> page =new Page<BookVo>();
+        page.setPageIndex(pageIndex);
+        page.setPageSize(pageSize);
+        page=libraryService.getLibraryBookList(userId, query,page);
         request.setAttribute("userInfo", userInfo);
+        request.setAttribute("page", page);
+        request.setAttribute("query", query);
         return "myLibrary.jsp";
     }
 
@@ -186,14 +201,27 @@ public class LibraryController extends BaseController{
         try {
             UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
             int userId=0;
+            int pageIndex=1;
+            int pageSize=21;
+            String query="";
+
             if(null!=userInfo){
                 userId=userInfo.getId();
             }
-            String query="";
             if (request.getParameter("query") != null) {
                 query = request.getParameter("query");
             }
-            List<BookVo> bookList=libraryService.getLibraryBookList(userId, query);
+            if (request.getParameter("pageIndex") != null) {
+                pageIndex =  NumberUtil.getInt(request.getParameter("pageIndex"), 1);
+            }
+            if (request.getParameter("pageSize") != null) {
+                pageSize =  NumberUtil.getInt(request.getParameter("pageSize"), 21);
+            }
+            Page<BookVo> page =new Page<BookVo>();
+            page.setPageIndex(pageIndex);
+            page.setPageSize(pageSize);
+            page=libraryService.getLibraryBookList(userId, query,page);
+            List<BookVo> bookList=page.getList();
             for(BookVo bookVo:bookList){
                 JSONObject obj = JSONObject.fromObject(bookVo);
                 array.add(obj);
@@ -201,6 +229,10 @@ public class LibraryController extends BaseController{
             result.put(Constants.STATUS, 1);
             result.put(Constants.MSG, "查询成功");
             result.put("array",array);
+            result.put("totlePages", page.getTotlePages());
+            result.put("pageIndex",pageIndex);
+            result.put("pageSize",pageSize);
+            result.put("totle",page.getTotle());
         } catch (Exception e) {
             logger.error("图书查询异常 " + e);
             callback = request.getParameter("callback");

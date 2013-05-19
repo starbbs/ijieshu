@@ -10,6 +10,7 @@ import com.ibook.library.entity.UserBookLog;
 import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
 import com.ibook.library.entity.UserMessage;
+import com.ibook.library.util.Page;
 import com.ibook.library.vo.BookVo;
 
 public interface CacheService {
@@ -69,7 +70,7 @@ public interface CacheService {
     
     public Integer saveLibraryBook(LibraryBook libraryBook);
     
-    public List<BookVo> getLibraryBookList(int userId, String query);
+    public Page<BookVo> getLibraryBookList(int userId, String query,Page<BookVo> page);
 
     public List<BookVo> getBookList(String query);
     

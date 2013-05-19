@@ -466,7 +466,7 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
         return list;
     }
 
-    public Set<Integer> getBookIdList(int userId, String query) {
+    public Set<Integer> getBookIdList(int userId, String query,int start,int end) {
         long startTime = System.currentTimeMillis();
         Set<Integer> list=new HashSet<Integer>();
         Connection conn = null;
@@ -480,7 +480,7 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
         }else{
             sql=sql+" order by lb.id desc";
         }
-        sql=sql+" limit 20";
+        sql=sql+" limit "+start+","+end;
         try {
             conn = dataSource.getConnection();
             ps = conn.prepareStatement(sql);
@@ -496,7 +496,34 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
         logger.info("getBookIdList SUCCESS time:"+(System.currentTimeMillis() - startTime));
         return list;
     }
-
+    
+    public int getBookIdCount(int userId, String query) {
+        int count=0;
+        long startTime = System.currentTimeMillis();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        String sql = "select count(DISTINCT(lb.book_id)) count from user_library ul,library_book lb where ul.user_id="+userId
+                +" and ul.library_id=lb.library_id ";
+        if(!StringUtil.isEmpty(query)){
+            sql=sql+" and lb.title like '%"+query+"%'";
+        }
+        try {
+            conn = dataSource.getConnection();
+            ps = conn.prepareStatement(sql);
+            result = ps.executeQuery();          
+            if (result.next()) {  
+                 count=result.getInt("count");
+            }
+        } catch (Exception e) {
+            logger.error("sql ERROR"+e);
+        } finally {
+            clean(result, ps, conn);
+        }
+        logger.info("getBookIdCount SUCCESS time:"+(System.currentTimeMillis() - startTime));
+        return count;
+    }
+    
     public Integer saveLibraryBook(LibraryBook libraryBook) {
         Integer id=null;
         long startTime = System.currentTimeMillis();
@@ -802,20 +829,20 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
     }
 
     @Override
-    public Set<Integer> getBookIdList(String query) {
+    public Set<Integer> getBookIdList(String query,int start,int end) {
         long startTime = System.currentTimeMillis();
         Set<Integer> list=new HashSet<Integer>();
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet result = null;
-        String sql = "select DISTINCT(lb.book_id) book_id from library_book lb ";
+        String sql = "select bk.id book_id from book bk ";
         if(!StringUtil.isEmpty(query)){
-            sql=sql+" where lb.title like '%"+query+"%'";
-            sql=sql+" order by lb.title";
+            sql=sql+" where bk.title like '%"+query+"%'";
+            sql=sql+" order by bk.title";
         }else{
-            sql=sql+" order by lb.id desc";
+            sql=sql+" order by bk.id desc";
         }
-        sql=sql+" limit 21";
+        sql=sql+" limit "+start+","+end;
         try {
             conn = dataSource.getConnection();
             ps = conn.prepareStatement(sql);
@@ -832,6 +859,33 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
         return list;
     }
 
+    @Override
+    public int getBookIdCount(String query) {
+        int count=0;
+        long startTime = System.currentTimeMillis();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        String sql = "select count(bk.id) count from book bk ";
+        if(!StringUtil.isEmpty(query)){
+            sql=sql+" where bk.title like '%"+query+"%'";
+        }
+        try {
+            conn = dataSource.getConnection();
+            ps = conn.prepareStatement(sql);
+            result = ps.executeQuery();          
+            while (result.next()) {  
+                 count=result.getInt("count");
+            }
+        } catch (Exception e) {
+            logger.error("sql ERROR"+e);
+        } finally {
+            clean(result, ps, conn);
+        }
+        logger.info("getBookIdCount1 SUCCESS time:"+(System.currentTimeMillis() - startTime));
+        return count;
+    }
+    
     @Override
     public int getUserCount() {
         long startTime = System.currentTimeMillis();

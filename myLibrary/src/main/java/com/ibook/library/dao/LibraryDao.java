@@ -68,9 +68,13 @@ public interface LibraryDao {
     
     public Integer saveLibraryBook(LibraryBook libraryBook);
     
-    public Set<Integer> getBookIdList(int userId, String query);
+    public Set<Integer> getBookIdList(int userId, String query,int start,int end);
     
-    public Set<Integer> getBookIdList(String query);
+    public int getBookIdCount(int userId, String query);
+    
+    public Set<Integer> getBookIdList(String query,int start,int end);
+    
+    public int getBookIdCount(String query);
     
     public List<Library> getLibrarys(String query);
     

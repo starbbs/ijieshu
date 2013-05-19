@@ -78,7 +78,7 @@ public class BookController extends BaseController{
     }
   
     @RequestMapping(value = "/book/mySearch")
-    public void index(final HttpServletRequest request, final HttpServletResponse response)throws IOException {
+    public void mySearch(final HttpServletRequest request, final HttpServletResponse response)throws IOException {
         JSONObject result = new JSONObject();
         JSONArray array=new JSONArray();
         //解决跨域

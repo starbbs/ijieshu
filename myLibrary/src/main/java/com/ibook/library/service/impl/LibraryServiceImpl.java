@@ -27,6 +27,7 @@ import com.ibook.library.service.LibraryService;
 import com.ibook.library.service.ThirdService;
 import com.ibook.library.util.EmailUtil;
 import com.ibook.library.util.MD5;
+import com.ibook.library.util.Page;
 import com.ibook.library.util.StringUtil;
 import com.ibook.library.vo.BookLogMessageVo;
 import com.ibook.library.vo.BookVo;
@@ -113,9 +114,9 @@ public class LibraryServiceImpl implements LibraryService {
         return list;
     }
 
-    public List<BookVo> getLibraryBookList(int userId,String query){
-        List<BookVo> list=cacheService.getLibraryBookList(userId, query);
-        return list;
+    public Page<BookVo> getLibraryBookList(int userId, String query,Page<BookVo> page){
+        page=cacheService.getLibraryBookList(userId, query,page);
+        return page;
     }
     
     /**

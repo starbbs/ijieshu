@@ -2,6 +2,7 @@
 <%@ page import="com.ibook.library.entity.UserInfo" %>
 <%@ page import="com.ibook.library.vo.BookVo" %>
 <%@ page import="com.ibook.library.cst.Constants" %>
+<%@ page import="com.ibook.library.util.Page" %>
 <%@ page import="java.util.List" %>
 <%
 	String myMessage="";
@@ -12,7 +13,12 @@
 	if(null!=userInfo){
 	userId=userInfo.getId();
 	}
-	List<BookVo> bookList=(List<BookVo>)request.getAttribute("bookList");
+	Page<BookVo> mypage=(Page<BookVo>)request.getAttribute("page");
+	String query=(String)request.getAttribute("query");
+	List<BookVo> bookList=mypage.getList();
+	int start=(mypage.getTotlePages()-(mypage.getPageIndex()+4))>=0?mypage.getPageIndex():((mypage.getTotlePages()-4)>0?(mypage.getTotlePages()-4):1);
+	int end=(start+4)>mypage.getTotlePages()?mypage.getTotlePages():(start+4);
+	
 %>
 <!DOCTYPE html>
 <html>
@@ -66,6 +72,19 @@
 				</div>
 				<%}%>
 			</div>
+<div class="pagination pagination-centered">
+  <ul>
+    	<%if(start!=1) {%>
+    		<li class=""><a href="/user/mylibrary?query=<%=query %>&pageIndex=<%=(start-1)>0?(start-1):1%>">&laquo;</a></li>
+	    <%} %>
+	    <%for(int i=start;i<=end;i++){ %>
+	    	<li class="<%=mypage.getPageIndex()==i?"active":""%>"><a href="/user/mylibrary?query=<%=query %>&pageIndex=<%=i%>"><%=i%></a></li>
+	    <%}%>
+    	<%if(end!=mypage.getTotlePages()) {%>
+    		<li class=""><a href="/user/mylibrary?query=<%=query %>&pageIndex=<%=(end+1>mypage.getTotlePages())?mypage.getTotlePages():end+1%>">&raquo;</a></li>
+	    <%} %>	    
+  </ul>
+</div>			
 		</div>
 
 		<%@include file="footer.html" %>

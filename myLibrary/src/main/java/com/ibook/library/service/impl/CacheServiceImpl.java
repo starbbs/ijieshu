@@ -26,6 +26,7 @@ import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
 import com.ibook.library.entity.UserMessage;
 import com.ibook.library.service.CacheService;
+import com.ibook.library.util.Page;
 import com.ibook.library.vo.BookVo;
 
 @Service
@@ -331,11 +332,13 @@ public class CacheServiceImpl implements CacheService {
         }
     }
 
-    public List<BookVo> getLibraryBookList(int userId, String query) {
+    public Page<BookVo> getLibraryBookList(int userId, String query,Page<BookVo> page) {
         List<BookVo> list=new ArrayList<BookVo>();
         Set<Integer> mybookIds=null;
+        int totle=0;
         if(0!=userId){
-            mybookIds=libraryDao.getBookIdList(userId, query);
+            mybookIds=libraryDao.getBookIdList(userId, query,(page.getPageIndex()-1)*page.getPageSize(),page.getPageIndex()*page.getPageSize());
+            totle=libraryDao.getBookIdCount(userId, query);
             for(Integer bookId:mybookIds){
                 BookVo bookVo=new BookVo();
                 Book book=getBook(bookId);
@@ -345,12 +348,13 @@ public class CacheServiceImpl implements CacheService {
                 for(UserLibrary userLibrary:libraryList){
                     libraryids.add(userLibrary.getLibraryId());
                 }
+                bookVo.setLibraryId(libraryids);
                 list.add(bookVo);
             } 
-        }
-        Set<Integer> bookIds=libraryDao.getBookIdList(query);
-        for(Integer bookId:bookIds){
-            if(null==mybookIds || !mybookIds.contains(bookId)){
+        }else{
+            Set<Integer> bookIds=libraryDao.getBookIdList(query,(page.getPageIndex()-1)*page.getPageSize(),page.getPageIndex()*page.getPageSize());
+            totle=libraryDao.getBookIdCount(query);
+            for(Integer bookId:bookIds){
                 BookVo bookVo=new BookVo();
                 Book book=getBook(bookId);
                 BeanUtils.copyProperties(book,bookVo);
@@ -359,10 +363,13 @@ public class CacheServiceImpl implements CacheService {
                 for(UserLibrary userLibrary:libraryList){
                     libraryids.add(userLibrary.getLibraryId());
                 }
-                list.add(bookVo);             
-            }
+                list.add(bookVo);                        
+            }  
         }
-        return list;
+        page.setList(list);
+        page.setTotle(totle);
+        page.setTotlePages(totle/page.getPageSize()+(totle%page.getPageSize()>0?1:0));
+        return page;
     }
 
     public Integer saveLibraryBook(LibraryBook libraryBook) {
@@ -921,7 +928,7 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public List<BookVo> getBookList(String query) {
         List<BookVo> list=new ArrayList<BookVo>();
-        Set<Integer> bookIds=libraryDao.getBookIdList(query);
+        Set<Integer> bookIds=libraryDao.getBookIdList(query,0,21);
         for(Integer bookId:bookIds){
             BookVo bookVo=new BookVo();
             Book book=getBook(bookId);
