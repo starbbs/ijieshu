@@ -46,9 +46,10 @@
 </head>
 
 <body>
+<div class="out_container">
 	<%@include file="header.jsp"%>
 
-	<div class="container form-signin" style="padding-top: 70px;">
+	<div class="container form-signin">
 		<div class="hero-unit" style="padding: 20px;">
 			<h2>爱•借书—基于地理位置的虚拟图书馆</h2>
 			<p>
@@ -96,9 +97,7 @@
 						    }
 						%>
 					</div>
-					<%
-					    }
-					%>
+					<%}%>
 				</div>
 			</fieldset>
 		</div>
@@ -114,7 +113,7 @@
 		<div class="modal-body"></div>
 	</div>
 
-
+</div>
 </body>
 
 <script type="text/javascript"

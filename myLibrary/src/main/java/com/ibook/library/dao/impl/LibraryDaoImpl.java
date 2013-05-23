@@ -129,6 +129,9 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
                 userInfo.setNick(rs.getString("nick"));
                 userInfo.setPassport(rs.getString("passport"));
                 userInfo.setPassword(rs.getString("password"));
+                userInfo.setReliableNum(rs.getInt("relible_num"));
+                userInfo.setUnReliableNum(rs.getInt("un_reliable_num"));
+                userInfo.setBorrowedLimit(rs.getInt("borrowed_limit"));
             }
         } catch (Exception e) {
             logger.error("sql ERROR"+e);
@@ -554,7 +557,7 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
         PreparedStatement ps = null;
         ResultSet rs = null;
 //        String sql = "select * from user_book_log where status="+Constants.BOOK_LOG_STATUS_APPLY+" and owner_user_id="+userid+" order by id desc";
-        String sql = "select * from user_book_log where status="+Constants.BOOK_LOG_STATUS_APPLY+" and (owner_user_id="+userid+" or borrow_user_id="+userid+") order by id desc";
+        String sql = "select * from user_book_log where  (owner_user_id="+userid+" or borrow_user_id="+userid+") order by id desc";
         try {
             conn = dataSource.getConnection();
             ps = conn.prepareStatement(sql);
@@ -943,6 +946,31 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
         }catch(Exception e) {
             logger.error("savePresentBookLog ERROR"+e);
             return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean delUserLibraryBook(int bookId, int userId) {
+        Connection conn = null;
+        PreparedStatement smt = null;
+        long startTime = System.currentTimeMillis();
+        try {
+            final String SQL = "delete from library_book where book_id="+bookId+" and owner_user_id="+userId;
+            conn = dataSource.getConnection(); 
+            smt = conn.prepareStatement(SQL);
+            smt.executeUpdate();
+            logger.info("delUserLibraryBook SUCCESS time:"+(System.currentTimeMillis() - startTime));
+        }catch(Exception e) {
+            logger.error("delUserLibraryBook ERROR"+e);
+            return false;
+        }finally {
+            try {
+                smt.close();
+                conn.close();
+            } catch (SQLException e) {
+                logger.error("finally ERROR"+e);
+            }
         }
         return true;
     }

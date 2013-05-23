@@ -26,7 +26,7 @@ public interface LibraryService {
     public List<BookVo> getBookList(String query);
 
 
-    public boolean sendMessage(int userId, int oldMsgId, String msg);
+    public int sendMessage(int userId, int oldMsgId, String msg);
 
     /**
      * 图书借阅申请

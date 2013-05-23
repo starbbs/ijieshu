@@ -84,6 +84,8 @@ public interface LibraryDao {
    
     public boolean delLibraryBook(int libraryId,int userId);
     
+    public boolean delUserLibraryBook(int bookId,int userId);
+    
     public int getLibraryBookCount(int libraryId);
     
     public int getBookCount();
@@ -95,4 +97,5 @@ public interface LibraryDao {
     public int getLibraryUserCount(int libraryId);
     
     public boolean savePresentBookLog(PresentBookLog presentBookLog);
+        
 }

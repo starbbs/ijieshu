@@ -32,6 +32,7 @@ import com.ibook.library.util.StringUtil;
 import com.ibook.library.vo.BookLogMessageVo;
 import com.ibook.library.vo.BookVo;
 import com.ibook.library.vo.UserLibraryVo;
+import com.ibook.library.vo.UserMessageVo;
 
 @Service
 public class LibraryServiceImpl implements LibraryService {
@@ -144,8 +145,34 @@ public class LibraryServiceImpl implements LibraryService {
                 libraryBook.setUrl(book.getAlt());
                 cacheService.saveLibraryBook(libraryBook);
                 cacheService.removeLibraryBookCount(userLibrary.getLibraryId());
-
             }
+        }
+
+    }
+    
+    /**
+     * 删除用户图书馆的某本书
+     * 
+     * @author xiaojianyu
+     */
+    public class RemoveBook2LibraryCommand implements Runnable {
+        
+        private int  bookId;
+        
+        private int userId;
+        
+        public RemoveBook2LibraryCommand(int  bookId,int userId) {
+            this.bookId=bookId;
+            this.userId=userId;
+        }
+
+        public void run() {
+            List<UserLibrary> list=cacheService.getUserLibraryList(userId);
+            cacheService.delUserLibraryBook(bookId, userId);//图书馆的书同步删除;
+            for(UserLibrary userLibrary:list){//情统计缓存
+                cacheService.removeLibraryBookCount(userLibrary.getLibraryId());
+            }
+            
         }
 
     }
@@ -197,7 +224,7 @@ public class LibraryServiceImpl implements LibraryService {
     }
 
     public boolean saveBorrowBookRequest(int userId,String passport,int borrowedLimit,int bookId, String msg) {
-        if(borrowedLimit>=Constants.MAX_BORROWED_LIMIT){
+        if(borrowedLimit<=0){
             return false;
         }
         Book book=cacheService.getBook(bookId);
@@ -207,9 +234,9 @@ public class LibraryServiceImpl implements LibraryService {
         //保存借书申请记录
         UserBookLog userBookLog=new UserBookLog();
         userBookLog.setBookId(book.getId());
-        userBookLog.setBorrowUserId(userId);
         userBookLog.setOwnerUserId(book.getOwnerUserId());
         userBookLog.setOwnerPassport(book.getOwnerPassport());
+        userBookLog.setBorrowUserId(userId);
         userBookLog.setBorrowPassport(passport);
         userBookLog.setStatus(Constants.BOOK_LOG_STATUS_APPLY);
         userBookLog=cacheService.saveUserBookLog(userBookLog);
@@ -243,44 +270,94 @@ public class LibraryServiceImpl implements LibraryService {
             return null;
         }
         List<BookLogMessageVo> volist=new ArrayList<BookLogMessageVo>(list.size());
-        for(UserBookLog userBookLog:list){
+        UserInfo userInfo=null;
+        UserInfo otherUser=null;
+        for(UserBookLog userBookLog:list){         
             BookLogMessageVo bookLogMessageVo=new BookLogMessageVo();
             Book book=cacheService.getBook(userBookLog.getBookId());
             bookLogMessageVo.setLogId(userBookLog.getId());
+            bookLogMessageVo.setStatus(userBookLog.getStatus());
+            bookLogMessageVo.setOwnerPassport(userBookLog.getOwnerPassport());
+            bookLogMessageVo.setOwnerUserId(userBookLog.getOwnerUserId());
+            bookLogMessageVo.setBorrowUserId(userBookLog.getBorrowUserId());
+            bookLogMessageVo.setBorrowPassport(userBookLog.getBorrowPassport());
             if(userBookLog.getOwnerUserId()==userId){
                 bookLogMessageVo.setMyBook(true);
+                if(null==userInfo){
+                    userInfo=cacheService.getUserInfo(userBookLog.getOwnerPassport()); 
+                }
+                bookLogMessageVo.setOwnerNick(userInfo.getNick());
+                
+                otherUser=cacheService.getUserInfo(userBookLog.getBorrowPassport()); 
+                if(null!=otherUser){
+                    bookLogMessageVo.setBorrowNick(otherUser.getNick());
+                    bookLogMessageVo.setBorrowReliableNum(otherUser.getReliableNum());
+                    if(userBookLog.getBorrowReliable()==Constants.RELIABLE_STATUS_NULL && otherUser.getUnReliableNum()<3){
+                        //不靠谱次数达到3次才显示给用户看
+                        bookLogMessageVo.setBorrowUnReliableNum(0); 
+                    }else{
+                        bookLogMessageVo.setBorrowUnReliableNum(otherUser.getUnReliableNum());
+                    }                   
+                }             
             }else{
                 bookLogMessageVo.setMyBook(false);
+                if(null==userInfo){
+                    userInfo=cacheService.getUserInfo(userBookLog.getBorrowPassport()); 
+                }
+                bookLogMessageVo.setBorrowReliableNum(userInfo.getReliableNum());
+                bookLogMessageVo.setBorrowUnReliableNum(userInfo.getUnReliableNum());
+                bookLogMessageVo.setBorrowNick(userInfo.getNick());
+                
+                otherUser=cacheService.getUserInfo(userBookLog.getOwnerPassport()); 
+                if(null!=otherUser){
+                    bookLogMessageVo.setOwnerNick(otherUser.getNick());
+                    bookLogMessageVo.setOwnerReliableNum(otherUser.getReliableNum());
+                    bookLogMessageVo.setOwnerUnReliableNum(otherUser.getUnReliableNum());  
+                }
+               
             }
+ 
             if(null!=book){
                 bookLogMessageVo.setBookId(book.getId());
-                bookLogMessageVo.setBookImg(book.getMediumImg());
+                bookLogMessageVo.setBookImg(book.getSmallImg());
                 bookLogMessageVo.setTitle(book.getTitle());
             }
             List<UserMessage> msgList=cacheService.getUserLogMessages(userBookLog.getId());
-            String msg="";
             bookLogMessageVo.setMsgId(0);
+            List<UserMessageVo> messages=new ArrayList<UserMessageVo>(msgList.size());
             for(UserMessage userMessage:msgList){
                 if(userMessage.getId()>bookLogMessageVo.getMsgId()){
                     bookLogMessageVo.setMsgId(userMessage.getId());
                 }
-                if(userMessage.getFromUserId()==userId){
-                    msg=msg+"我我: ";
+                UserMessageVo userMessageVo=new UserMessageVo();
+                BeanUtils.copyProperties(userMessage, userMessageVo);
+                if(userMessageVo.getFromUserId()==userInfo.getId()){
+                    userMessageVo.setFromUserNick(userInfo.getNick());
+                    userMessageVo.setFromUserPassport(userInfo.getPassport());
+                    if(null!=otherUser){
+                        userMessageVo.setToUserNick(otherUser.getNick());
+                        userMessageVo.setToUserPassport(otherUser.getPassport());                     
+                    }
                 }else{
-                    msg=msg+"你你: ";
+                    userMessageVo.setToUserNick(userInfo.getNick());
+                    userMessageVo.setToUserPassport(userInfo.getPassport());
+                    if(null!=otherUser){
+                        userMessageVo.setFromUserNick(otherUser.getNick());
+                        userMessageVo.setFromUserPassport(otherUser.getPassport());                    
+                    }
                 }
-                msg=msg+userMessage.getMsg()+"<br/>";
+                messages.add(userMessageVo);
             }
-            bookLogMessageVo.setMsg(msg);
+            bookLogMessageVo.setMessages(messages);
             volist.add(bookLogMessageVo);
         }
         return volist;
     }
 
-    public boolean sendMessage(int userId, int oldMsgId, String msg) {
+    public int sendMessage(int userId, int oldMsgId, String msg) {
         UserMessage oldUserMessage=cacheService.getUserMessage(oldMsgId);
         if(null==oldUserMessage){
-            return false;
+            return 0;
         }
         UserMessage userMessage=new UserMessage();
         userMessage.setLogId(oldUserMessage.getLogId());
@@ -290,9 +367,9 @@ public class LibraryServiceImpl implements LibraryService {
         userMessage.setOldMsgId(oldMsgId);
         userMessage=cacheService.saveUserMessage(userMessage);
         if(null==userMessage){
-            return false;
+            return 0;
         }
-        return true;
+        return userMessage.getId();
     }
 
     public boolean revertBook(int userId, int logId) {
@@ -363,16 +440,24 @@ public class LibraryServiceImpl implements LibraryService {
     
     public boolean appraiseTheBorrowed(int userId,int logId,int reliable) {
         UserBookLog userBookLog=cacheService.getUserBookLog(logId);
-        if(null==userBookLog || userBookLog.getOwnerUserId()!=userId){
+        if(null==userBookLog || userBookLog.getOwnerUserId()!=userId || userBookLog.getBorrowReliable()!=Constants.RELIABLE_STATUS_NULL){
             return false;
         }
         userBookLog.setBorrowReliable(reliable);
-        boolean flag=cacheService.updateUserBookLog(userBookLog);//更新借阅记录为拒绝借出
+        boolean flag=cacheService.updateUserBookLog(userBookLog);//更新借阅者的靠谱信息
         if(!flag){
             logger.error("rejectBorrowBook ERROR,更新借阅记录失败");
             return false;
         }
-        return true;
+        UserInfo userInfo=cacheService.getUserInfo(userBookLog.getBorrowPassport());
+        if(Constants.RELIABLE_STATUS_YES==reliable){
+            userInfo.setReliableNum(userInfo.getReliableNum()+1);
+
+        }else{
+            userInfo.setUnReliableNum(userInfo.getUnReliableNum()+1);
+        }
+        flag=cacheService.updateUserInfo(userInfo);//更新用户靠谱、不靠谱统计数
+        return flag;
     }
     
     public boolean presentBook(int userId, int logId) {
@@ -395,6 +480,7 @@ public class LibraryServiceImpl implements LibraryService {
         PresentBookLog presentBookLog=new PresentBookLog();
         presentBookLog.setFromUserId(book.getOwnerUserId());
         presentBookLog.setToUserId(book.getBorrowUserId());
+        presentBookLog.setBookId(book.getId());
         flag=cacheService.savePresentBookLog(presentBookLog);
         if(!flag){
             logger.error("presentBook ERROR,图书赠送失败");
@@ -402,13 +488,17 @@ public class LibraryServiceImpl implements LibraryService {
         }
         book.setStatus(Constants.BOOK_STATUS_FREE);//解锁该书
         book.setOwnerUserId(book.getBorrowUserId());
+        book.setOwnerPassport(book.getBorrowPassport());
         flag=cacheService.updateBook(book);
         if(!flag){
             logger.error("presentBook ERROR,图书解锁失败");
             return false;
         }
-        this.incrUserBorrowedLimit(userBookLog.getBorrowPassport());
-        return cacheService.unLockLibraryBook(userBookLog.getBookId());//图书馆的书同步解锁;
+        cacheService.removeBookList(userId);//清用户图书列表缓存
+        cacheService.removeBookList(book.getBorrowUserId());//清用户图书列表缓存
+        executorService.execute(new Book2LibraryCommand(book));//增加获赠的图书到图书馆
+        executorService.execute(new RemoveBook2LibraryCommand(book.getId(),userId));//从图书馆删除用户赠送的图书
+        return this.incrUserBorrowedLimit(userBookLog.getBorrowPassport());
     }
     
     public boolean quitLibrary(int userLibraryId,int libraryId,int userId) {
@@ -416,7 +506,10 @@ public class LibraryServiceImpl implements LibraryService {
         if(!flag){
             return false;
         }
-        flag=cacheService.deleteLibrartBook(libraryId, userId);//删除用户在该图书馆的书籍
+        flag=cacheService.delLibraryBook(libraryId, userId);//删除用户在该图书馆的书籍
+        if(flag){
+            cacheService.removeLibraryBookCount(libraryId);
+        }
         return flag;
     }
 

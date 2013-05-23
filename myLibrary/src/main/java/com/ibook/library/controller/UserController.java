@@ -534,6 +534,14 @@ public class UserController extends BaseController {
             String callback = request.getParameter("callback");
             String bookId = "";
             String msg="";
+            
+            if(userInfo.getBorrowedLimit()<=0){
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【达到同时借阅本数上限】先看完书再借吧！");
+                getJson(request, response, callback, result.toString());
+                return;
+            }
+            
             if (request.getParameter("id") != null) {
                 bookId = request.getParameter("id");
             }
@@ -612,10 +620,13 @@ public class UserController extends BaseController {
                 getJson(request, response, callback, result.toString());
                 return;
             }
-            boolean flag=libraryService.sendMessage(userInfo.getId(),Integer.valueOf(oldMsgId), msg);
-            if(flag){
+            int msgId=libraryService.sendMessage(userInfo.getId(),Integer.valueOf(oldMsgId), msg);
+            if(msgId>0){
                 result.put(Constants.STATUS, 1);
+                result.put("nick", userInfo.getNick());
+                result.put("msgId", msgId);
                 result.put(Constants.MSG, "【消息发送成功】遇见一位爱书之人,美哉!");
+                
                 getJson(request, response, callback, result.toString());
             }else{
                 result.put(Constants.STATUS, -1);

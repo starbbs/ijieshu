@@ -108,8 +108,10 @@ public interface CacheService {
     
     public boolean deleteUserLibrary(int id, int userId);
     
-    public boolean deleteLibrartBook(int libraryId,int userId);
-     
+    public boolean delLibraryBook(int libraryId,int userId);
+    
+    public boolean delUserLibraryBook(int bookId,int userId);
+    
     public int getLibraryBookCount(int libraryId);
     
     public int getLibraryUserCount(int libraryId);

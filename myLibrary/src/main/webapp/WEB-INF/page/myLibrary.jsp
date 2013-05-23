@@ -39,6 +39,7 @@
 	</head>
 
 	<body>
+<div class="out_container">	
 		<%@include file="header.jsp"%>
 
 		<div class="container form-signin" style="padding-top:70px;">
@@ -97,7 +98,7 @@
 		</div>
 		<div class="modal-body"></div>
 	</div>
-		
+</div>		
 	</body>
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/bootstrap.js"></script>
 	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/popup.js"></script>

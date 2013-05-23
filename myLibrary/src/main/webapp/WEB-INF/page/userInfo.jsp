@@ -51,7 +51,7 @@
 </head>
 
 <body>
-
+<div class="out_container">
 	<%@include file="header.jsp"%>
 	<div class="container form-signin" style="padding-top: 40px;">
 		<fieldset>
@@ -79,31 +79,24 @@
 	<div class="container form-signin">
 		<fieldset>
 			<legend>我的图书馆 </legend>
-			<div class="container-fluid">
+			<ul class="sns_tj_list o">
 				<%
 				    for(UserLibraryVo userLibrary : list){
 				%>
-				<div class="span2">
-					<a class=" close thumbnail" title="退出图书馆"
-						onclick="javascript:quitLibrary(<%=userLibrary.getId()%>,<%=userLibrary.getLibraryId()%>)">
-						<h3><%=userLibrary.getLibraryName()%></h3>
-						<p>
-							馆藏图书：
-							<%=userLibrary.getBookCount()%>
-							本
-						</p>
-						<p>
-							馆君：
-							<%=userLibrary.getUserCount()%>
-							位
-						</p>
-					</a>
-
-				</div>
+                    <li>
+                    	<div class="sns_tj_p">
+                            <div class="sns_tj_info">
+                            	<p><a  class="ba"><%=userLibrary.getLibraryName()%></a></p>
+                                <p>馆藏：<a  class="ba"><%=userLibrary.getBookCount()%></a>本</p>
+                                <p>馆君：<a  class="ba"><%=userLibrary.getUserCount()%></a>位</p>
+                            </div>
+                            <h4 class="top_gz sns_tj_gz" onclick="javascript:quitLibrary(<%=userLibrary.getId()%>,<%=userLibrary.getLibraryId()%>)"><strong>×</strong></h4>
+                        </div>
+                    </li>
 				<%
 				    }
 				%>
-			</div>
+			</ul>
 			<div id="mapContainer" style="width: 100%; height: 400px;"></div>			
 		</fieldset>
 	</div>
@@ -116,6 +109,7 @@
 		</div>
 		<div class="modal-body container-fluid"></div>
 	</div>
+</div>
 </body>
 <script type="text/javascript"
 	src="http://zjdesj.github.io/javascript/myjs/bootstrap.js"></script>

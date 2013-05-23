@@ -707,7 +707,8 @@ public class CacheServiceImpl implements CacheService {
         return flag;
     }
 
-    public boolean deleteLibrartBook(int libraryId, int userId) {
+    @Override
+    public boolean delLibraryBook(int libraryId, int userId) {
         boolean flag=libraryDao.delLibraryBook(libraryId, userId);
         return flag;
     }
@@ -1027,5 +1028,11 @@ public class CacheServiceImpl implements CacheService {
     public boolean savePresentBookLog(PresentBookLog presentBookLog) {
         // TODO Auto-generated method stub
         return libraryDao.savePresentBookLog(presentBookLog);
+    }
+
+    @Override
+    public boolean delUserLibraryBook(int book, int userId) {
+        boolean flag=libraryDao.delLibraryBook(book, userId);
+        return flag;
     }
 }

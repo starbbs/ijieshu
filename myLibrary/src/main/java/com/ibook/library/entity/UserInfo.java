@@ -56,6 +56,14 @@ public class UserInfo implements Serializable{
     @Column(name = "borrowed_limit")
     private int borrowedLimit;
     
+    /** 靠谱数 **/
+    @Column(name = "relible_num")
+    private int reliableNum;
+    
+    /** 不靠谱数 **/
+    @Column(name = "un_reliable_num")
+    private int unReliableNum;
+    
     public int getId() {
         return id;
     }
@@ -103,6 +111,18 @@ public class UserInfo implements Serializable{
     }
     public void setBorrowedLimit(int borrowedLimit) {
         this.borrowedLimit = borrowedLimit;
+    }
+    public int getReliableNum() {
+        return reliableNum;
+    }
+    public void setReliableNum(int reliableNum) {
+        this.reliableNum = reliableNum;
+    }
+    public int getUnReliableNum() {
+        return unReliableNum;
+    }
+    public void setUnReliableNum(int unReliableNum) {
+        this.unReliableNum = unReliableNum;
     }
     
     
