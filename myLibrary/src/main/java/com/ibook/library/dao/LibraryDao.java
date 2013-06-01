@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Set;
 
 import com.ibook.library.entity.Book;
+import com.ibook.library.entity.BookTag;
 import com.ibook.library.entity.Library;
 import com.ibook.library.entity.LibraryBook;
 import com.ibook.library.entity.PresentBookLog;
+import com.ibook.library.entity.Tag;
 import com.ibook.library.entity.UserBookLog;
 import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
@@ -76,7 +78,7 @@ public interface LibraryDao {
     
     public int getBookIdCount(String query);
     
-    public List<Library> getLibrarys(String query);
+    public List<Library> getLibrarys(String query,String city);
     
     public boolean lockLibraryBook(int bookId);
     
@@ -97,5 +99,9 @@ public interface LibraryDao {
     public int getLibraryUserCount(int libraryId);
     
     public boolean savePresentBookLog(PresentBookLog presentBookLog);
+    
+    public boolean saveTag(Tag tag);
+    
+    public boolean saveBookTag(BookTag bookTag);
         
 }

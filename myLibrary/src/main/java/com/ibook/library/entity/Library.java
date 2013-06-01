@@ -70,6 +70,10 @@ public class Library implements Serializable {
     @Column(name = "for_public") 
     private boolean forPublic;
     
+    /** 图书馆类型type **/
+    @Column(name = "type") 
+    private int type;
+    
     public int getId() {
         return id;
     }
@@ -180,6 +184,14 @@ public class Library implements Serializable {
 
     public void setForPublic(boolean forPublic) {
         this.forPublic = forPublic;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
     
 }

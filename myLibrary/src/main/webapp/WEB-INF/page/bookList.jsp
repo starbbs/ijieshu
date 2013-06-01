@@ -18,17 +18,18 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>爱•借书-图书</title>
+		<title>爱♥借书-图书</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta name="description" content="">
 		<meta name="author" content="">
-		<link href="http://zjdesj.github.io/javascript/mycss/bootstrap.min.css" rel="stylesheet" />
-		<link href="http://zjdesj.github.io/javascript/mycss/bootstrap-responsive.min.css" rel="stylesheet" />
-		<link href="http://zjdesj.github.io/javascript/mycss/common.css" rel="stylesheet" />
-		<link href="http://zjdesj.github.io/javascript/mycss/main.css" rel="stylesheet" />
+		<link href="/css/bootstrap.css" rel="stylesheet" />
+		<link href="/css/bootstrap-responsive.css" rel="stylesheet" />
+		<link href="/css/common.css" rel="stylesheet" />
+		<link href="/css/main.css" rel="stylesheet" />
 		<script type="text/javascript">
 			var iS = typeof iS == 'undefined' ? {}:iS;
 			iS.globalUserId=<%=userId%>;
+			iS.action=function(){};
 		</script>
 	</head>
 
@@ -76,9 +77,9 @@
 
 	</body>
 
-	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/bootstrap.js"></script>
-	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/popup.js"></script>
-	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/index.js"></script>
+	<script type="text/javascript" src="/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/js/popup.js"></script>
+	<script type="text/javascript" src="/js/index.js"></script>
 
-	<script type="text/javascript" src="http://zjdesj.github.io/javascript/myjs/common.js"></script>
+	<script type="text/javascript" src="/js/common.js"></script>
 </html>

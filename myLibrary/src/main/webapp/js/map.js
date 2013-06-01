@@ -42,40 +42,19 @@ $(function(){
         this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
         this.defaultOffset = new BMap.Size(10, 10);
     }
-
-    // 通过JavaScript的prototype属性继承于BMap.Control
     ZoomControl.prototype = new BMap.Control();
-
-    // 自定义控件必须实现自己的initialize方法,并且将控件的DOM元素返回
-    // 在本方法中创建个div元素作为控件的容器,并将其添加到地图容器中
     ZoomControl.prototype.initialize = function(map) {
-        // 创建一个DOM元素
         var div = document.createElement("div");
-        // 添加文字说明
-        //div.appendChild(document.createTextNode("创建我的图书馆"));
-        $(div).html('<button  class="btn btn-primary">创建我的图书馆</button>');
-        // 设置样式
-        //	div.style.cursor = "pointer";
-        //	div.style.border = "1px solid gray";
-        //	div.style.backgroundColor = "blue";
-        // 绑定事件,点击一次放大两级
-        div.onclick = function(e) {
-            if(0==globalUserId){
-                alert("登录后就可以创建属于自己的图书馆哟!");
-                return;
-            }
-            addLibraryPoint();
-        }
-        // 添加DOM元素到地图中
+        $(div).html('<button  class="btn btn-success js_createmylib">创建我的图书馆</button');
         map.getContainer().appendChild(div);
-        // 将DOM元素返回
         return div;
     }
+    
+
     // 创建控件
     var myZoomCtrl = new ZoomControl();
     // 添加到地图当中
     map.addControl(myZoomCtrl);
-
     // 拼接infowindow内容字串
     var html = [];
     html.push('<span style="font-size:12px">创建图书馆: </span><br/>');
@@ -97,7 +76,7 @@ $(function(){
     html.push('  </tr>');
     html.push('  <tr>');
     html.push('	     <td  align="center" colspan="3">');
-    html.push('          <input type="button" name="btnOK" class="btn btn-primary" onclick="fnOK()" value="确定">&nbsp;&nbsp;');
+    html.push('          <input type="button" name="btnOK" class="btn btn-success" onclick="fnOK()" value="确定">&nbsp;&nbsp;');
     html.push('	     </td>');
     html.push('  </tr>');
     html.push('	     <input type="hidden"  id="txtLongitude"></td>');
@@ -114,99 +93,141 @@ $(function(){
 
     // 选择样式
     function addLibraryPoint() {
-        mkrTool.open(); // 打开工具
-        var icon=new BMap.Icon(" http://api.map.baidu.com/images/marker_red_sprite.png",new BMap.Size(35, 45));
-        // --
-        // BMapLib.MarkerTool.SYS_ICONS[23]
-        mkrTool.setIcon(icon);
-    }
-
-    //提交数据
-    function fnOK(){
-        var name =$("#txtName").val();
-        var addr =$("#txtAddr").val();
-        var desc =$("#areaDesc").val();
-        var longitude =$("#txtLongitude").val();
-        var latitude =$("#txtLatitude").val();
-        var citys =$("#txtCitys").val();
-
-        if(!name || !addr){
-            alert("名称和地址不能为空,悟空你又调皮了-_-");    
+    	if(0==iS.globalUserId){
+            $('#loginModal').modal('toggle');
             return;
         }
-        //在此用户可将数据提交到后台数据库中
-        $.post("/user/addLibrary", {
-            "libraryName" : name,
-            "libraryAddr" : addr,
-            "libraryDesc" : desc,
-            "longitude" : longitude,
-            "latitude" : latitude,
-            "citys":citys
-        }, function(data) {
-            if(data.status==1){
-                location.href = "/user/myself";
-            }else{
-                alert(data.msg);;
-            }
-        }, "json");
+        mkrTool.open(); // 打开工具
+        var icon=new BMap.Icon(" http://api.map.baidu.com/images/marker_red_sprite.png",new BMap.Size(35, 45));
+        mkrTool.setIcon(icon);
     }
 
     function getLibrary(){
         var url="/library/queryLibrary";
+        var marker;
         $.getJSON(url, function (data) {
+        	var flag=false;
             $.each(data.array, function(i, library) {
                 var name=library.name;
                 var longitude=library.longitude;
                 var latitude=library.latitude;
                 var bookCount=library.bookCount;
                 var userCount=library.userCount;
+                var type=library.type;
                 var point = new BMap.Point(longitude,latitude);
-                var marker = new BMap.Marker(point);
+                marker = new BMap.Marker(point);
                 var icon=new BMap.Icon(" http://api.map.baidu.com/images/marker_red_sprite.png",new BMap.Size(35, 45));
                 marker.setIcon(icon);
-                map.addOverlay(marker);					
+                map.addOverlay(marker);	
+                
                 var sContent =
                 "<div>"+
-                "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>"+library.name+"</h4>" +
-                "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>藏书："+library.bookCount+"本</p>" +
-                "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>馆君："+library.userCount+"位</p>" +
-                "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>简介："+library.desc+"</p>" + 
-                "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>地址："+library.addr+"</p>" +
-                "<input  type='button'id name='btnOK' class='btn btn-primary' onclick='addMyLibrary(\""+library.name+"\")' value='加入图书馆'/>"+
-                "</div>";
+                "<h4>"+library.name+"</h4>" +
+                "<p >藏书："+library.bookCount+"本</p>" +
+                "<p >馆君："+library.userCount+"人</p>" +
+                "<p >简介："+library.desc+"</p>" + 
+                "<p >地址："+library.addr+"</p>";             
+                var btnDis=""
+                if(0==iS.globalUserId || !library.myLib){
+                	btnDis="<input  type='button' class='btn btn-success r' onclick='addMyLibrary(\""+library.name+"\")' value='加入'/>";
+                }else{
+                	btnDis="<input  type='button' class='btn btn-success r' onclick='quitMyLibrary(\""+library.id+"\",\""+library.userLibraryId+"\")' value='退出'/>";                	
+                }
+                sContent=sContent+btnDis+"</div>";
+                
             //					marker.openInfoWindow(new BMap.InfoWindow(sContent),point);
             var infoWindow = new BMap.InfoWindow(sContent);  // 创建信息窗口对象
             var label = new BMap.Label(library.name, { point: point, offset: new BMap.Size(0, -20) });       //定义一个文字标签
             label.setStyle({ backgroundColor:"#104E8B",color : "white", fontSize : "15px",borderStyle:"none",fontWeight:"bold"});
             marker.setLabel(label);
-
             marker.addEventListener("click", function(){          
                 this.openInfoWindow(infoWindow);
             });
+            if(library.myLib){
+            	flag=true;
+                marker.openInfoWindow(infoWindow);
+            }
+            if(!flag){
+            	if(type==1){
+                    marker.openInfoWindow(infoWindow);
+            	}
+            }
             });
         });
     }	
 
-    function addMyLibrary(library){
-        if(0==globalUserId){
-            alert("登录后就可以加入属于自己的图书馆哟!");
-            return;
-        }
-        var url ="/user/addLibrary?libraryName="+library;
-        $.getJSON(url, function (data) {
-            if(data.status==1){
-                //图书馆添加成功
-                $('.libraryMsg').html(data.msg);
-                $('.libraryMsg').show();	
-                location.href = "/user/myself";
-            }else{
-                if(data.status==1){
-                    //图书馆添加失败
-                    $('.libraryMsg').html(data.msg);
-                    $('.libraryMsg').show();
-                }
-            }
-        });
-    }
+    
+    $('.js_mapcontainer').delegate('.js_createmylib', 'click', function(evt){
+    	addLibraryPoint();
+    });
+    
 });
 
+
+
+//提交数据
+function fnOK(){
+    var name =$("#txtName").val();
+    var addr =$("#txtAddr").val();
+    var desc =$("#areaDesc").val();
+    var longitude =$("#txtLongitude").val();
+    var latitude =$("#txtLatitude").val();
+    var citys =$("#txtCitys").val();
+
+    if(!name || !addr){
+    	iS.showTip("名称和地址不能为空,悟空你又调皮了-_-");    
+        return;
+    }
+    //在此用户可将数据提交到后台数据库中
+    $.post("/user/addLibrary", {
+        "libraryName" : name,
+        "libraryAddr" : addr,
+        "libraryDesc" : desc,
+        "longitude" : longitude,
+        "latitude" : latitude,
+        "citys":citys
+    }, function(data) {
+        if(data.status==1){
+            location.href = "/user/myself";
+        }else{
+        	iS.showTip(data.msg);;
+        }
+    }, "json");
+}
+
+
+function addMyLibrary(library){
+    if(0==iS.globalUserId){
+    	iS.action=function(){
+    		var url ="/user/addLibrary?libraryName="+library;
+    	    $.getJSON(url, function (data) {
+    	        if(data.status==1){
+    	            location.href = "/user/index";
+    	        }else{
+    	        	iS.showTip(data.msg);
+    	        }
+    	    });
+    	};
+        $('#loginModal').modal('toggle');
+        return;
+    }
+    var url ="/user/addLibrary?libraryName="+library;
+    $.getJSON(url, function (data) {
+        if(data.status==1){
+            location.href = "/user/index";
+        }else{
+        	iS.showTip(data.msg);
+        }
+    });
+}
+
+function quitMyLibrary(libraryId,userLibraryId){
+	var url ="/user/quitLibrary?libraryId="+libraryId+"&userLibraryId="+userLibraryId;
+    $.getJSON(url, function (data) {
+        if(data.status==1){
+            location.href = "/user/index";
+        }else{
+        	iS.showTip(data.msg);
+        }
+    });
+}

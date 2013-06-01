@@ -104,7 +104,7 @@ public interface CacheService {
     
     public void removeUserMessages(int logId);
     
-    public List<Library> getLibrarys(String query);
+    public List<Library> getLibrarys(String query,String city);
     
     public boolean deleteUserLibrary(int id, int userId);
     

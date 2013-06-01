@@ -6,6 +6,7 @@ import com.ibook.library.entity.Book;
 import com.ibook.library.entity.Library;
 import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
+import com.ibook.library.util.AppraiseCallBack;
 import com.ibook.library.util.Page;
 import com.ibook.library.vo.BookLogMessageVo;
 import com.ibook.library.vo.BookVo;
@@ -75,7 +76,7 @@ public interface LibraryService {
      * @param reliable
      * @return
      */
-    public boolean appraiseTheBorrowed(int userId,int logId,int reliable);
+    public AppraiseCallBack appraiseTheBorrowed(int userId,int logId,int reliable);
     
     public List<Library> getLibrarys(String query,String city);
 
@@ -106,5 +107,13 @@ public interface LibraryService {
      * @return
      */
     public boolean decrUserBorrowedLimit(String passport);
+    
+    /**
+     * 图书下架
+     * @param userId
+     * @param bookId
+     * @return
+     */
+    public boolean delBook(int userId,int bookId);
 
 }

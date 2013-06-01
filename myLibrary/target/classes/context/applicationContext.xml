@@ -100,6 +100,7 @@
 				<value>com.ibook.library.entity.Library</value>
 				<value>com.ibook.library.entity.UserLibrary</value>
 				<value>com.ibook.library.entity.LibraryBook</value>
+				<value>com.ibook.library.entity.PresentBookLog</value>			
 			</list>
 		</property>
 	</bean>

@@ -1,7 +1,10 @@
 package com.ibook.library.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,7 +62,7 @@ public class LibraryController extends BaseController{
     
     @RequestMapping(value = "/user/myself")
     public String userInfo(final HttpServletRequest request, final HttpServletResponse response) {
-        UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
+      /*  UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
         if(null==userInfo){
             return "redirect:/user/index";
         } 
@@ -68,7 +71,8 @@ public class LibraryController extends BaseController{
         request.setAttribute("userInfo", userInfo);
         request.setAttribute("libraryList", list);
         request.setAttribute("bookList", bookList);
-        return "userInfo.jsp";
+        return "userInfo.jsp";*/
+        return "redirect:/user/index";
     }
     
     /**
@@ -162,7 +166,7 @@ public class LibraryController extends BaseController{
         UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
         int userId=0;
         int pageIndex=1;
-        int pageSize=21;
+        int pageSize=24;
         String query="";
 
         if(null!=userInfo){
@@ -202,7 +206,7 @@ public class LibraryController extends BaseController{
             UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
             int userId=0;
             int pageIndex=1;
-            int pageSize=21;
+            int pageSize=24;
             String query="";
 
             if(null!=userInfo){
@@ -252,18 +256,24 @@ public class LibraryController extends BaseController{
     @RequestMapping(value = "/user/index")
     public String index(final HttpServletRequest request, final HttpServletResponse response) {
         UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
+        List<BookVo> bookList=null;
         if(null!=userInfo){
             request.setAttribute("userInfo", userInfo);
-        }
-        String query="";
-        if (request.getParameter("query") != null) {
-            query = request.getParameter("query");
+            List<Book> myBookList=libraryService.getBookList(userInfo.getId());
+            Page<BookVo> page =new Page<BookVo>();
+            page.setPageIndex(1);
+            page.setPageSize(24);
+            page=libraryService.getLibraryBookList(userInfo.getId(), "",page);
+            bookList=page.getList();
+            request.setAttribute("myBookList", myBookList);
+        }else{
+            request.setAttribute("myBookList", new ArrayList<Book>());
+            bookList=libraryService.getBookList("");
         }
         int bookCount=libraryService.getBookCount();
         int libraryCount=libraryService.getLibraryCount();
         int userCount=libraryService.getUserCount();
 
-        List<BookVo> bookList=libraryService.getBookList(query);
         request.setAttribute("bookList", bookList);
         request.setAttribute("bookCount", bookCount);
         request.setAttribute("libraryCount", libraryCount);
@@ -379,12 +389,18 @@ public class LibraryController extends BaseController{
             if (request.getParameter("city") != null) {
                 city = request.getParameter("city");
             }
-            /*if (StringUtil.isEmpty(query)) {
-                result.put(Constants.STATUS, -1);
-                result.put(Constants.MSG, "【查询条件为空】悟空你又调皮了-_-");
-                getJson(request, response, callback, result.toString());
-                return;
-            }*/
+            UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
+            Map<Integer,UserLibraryVo> myLibMap=null;
+            if(null!=userInfo){
+                List<UserLibraryVo> myLibrarys=libraryService.getUserLibraryList(userInfo.getId());
+                myLibMap=new HashMap<Integer,UserLibraryVo>(myLibrarys.size());
+                for(UserLibraryVo userLibraryVo:myLibrarys){
+                    myLibMap.put(userLibraryVo.getLibraryId(), userLibraryVo);
+                }
+            }else{
+                myLibMap=new HashMap<Integer,UserLibraryVo>(0);
+            }
+
             List<Library> list=libraryService.getLibrarys(query,city);
             for(Library library:list){
                 JSONObject obj = new JSONObject();
@@ -394,8 +410,17 @@ public class LibraryController extends BaseController{
                 obj.put("addr", library.getAddress());
                 obj.put("longitude", library.getLongitude());
                 obj.put("latitude", library.getLatitude());
-                obj.put("bookCount", cacheService.getLibraryBookCount(library.getId()));
-                obj.put("userCount", cacheService.getLibraryUserCount(library.getId()));
+                obj.put("type", library.getType());
+                if(myLibMap.containsKey(library.getId())){
+                    obj.put("bookCount", myLibMap.get(library.getId()).getBookCount());
+                    obj.put("userCount", myLibMap.get(library.getId()).getUserCount());
+                    obj.put("userLibraryId", myLibMap.get(library.getId()).getId());
+                    obj.put("myLib",true);
+                }else{
+                    obj.put("bookCount", cacheService.getLibraryBookCount(library.getId()));
+                    obj.put("userCount", cacheService.getLibraryUserCount(library.getId()));
+                    obj.put("myLib",false);
+                }
                 array.add(obj);
             }
             result.put(Constants.STATUS, 1);

@@ -538,8 +538,8 @@ public class CacheServiceImpl implements CacheService {
         }
     }
 
-    public List<Library> getLibrarys(String query) {
-        return libraryDao.getLibrarys(query);
+    public List<Library> getLibrarys(String query,String city) {
+        return libraryDao.getLibrarys(query,city);
     }
 
     public boolean lockLibraryBook(int bookId) {
@@ -929,7 +929,7 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public List<BookVo> getBookList(String query) {
         List<BookVo> list=new ArrayList<BookVo>();
-        Set<Integer> bookIds=libraryDao.getBookIdList(query,0,21);
+        Set<Integer> bookIds=libraryDao.getBookIdList(query,0,24);
         for(Integer bookId:bookIds){
             BookVo bookVo=new BookVo();
             Book book=getBook(bookId);
@@ -939,6 +939,7 @@ public class CacheServiceImpl implements CacheService {
             for(UserLibrary userLibrary:libraryList){
                 libraryids.add(userLibrary.getLibraryId());
             }
+            bookVo.setLibraryId(libraryids);
             list.add(bookVo);
         }
         return list;

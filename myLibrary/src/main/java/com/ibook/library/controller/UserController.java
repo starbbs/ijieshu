@@ -22,6 +22,7 @@ import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
 import com.ibook.library.service.CacheService;
 import com.ibook.library.service.LibraryService;
+import com.ibook.library.util.AppraiseCallBack;
 import com.ibook.library.util.MD5;
 import com.ibook.library.util.StringUtil;
 import com.ibook.library.vo.UserLibraryVo;
@@ -306,17 +307,27 @@ public class UserController extends BaseController {
             JSONObject result = new JSONObject();
             // 解决跨域
             String callback = request.getParameter("callback");
-            String password = "";
-            if (request.getParameter("password") != null) {
-                password = request.getParameter("password");
+            String oldPassword = "";
+            String newPassword = "";
+            if (request.getParameter("oldPassword") != null) {
+                oldPassword = request.getParameter("oldPassword");
             }
-            if (StringUtil.isEmpty(password)) {
+            if (request.getParameter("newPassword") != null) {
+                newPassword = request.getParameter("newPassword");
+            }
+            if (StringUtil.isEmpty(oldPassword)||StringUtil.isEmpty(newPassword)) {
                 result.put(Constants.STATUS, -1);
-                result.put(Constants.MSG, "【密码不能为空】悟空你又调皮了-_-");
+                result.put(Constants.MSG, "【新旧密码不能为空】悟空你又调皮了-_-");
                 getJson(request, response, callback, result.toString());
                 return;
             }
-            userInfo.setPassword(MD5.getMD5Str(password));
+            if(!MD5.getMD5Str(oldPassword).equals(userInfo.getPassword())){
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【旧密码错误】悟空你又调皮了-_-");
+                getJson(request, response, callback, result.toString());
+                return;  
+            }
+            userInfo.setPassword(MD5.getMD5Str(newPassword));
             boolean flag=libraryService.updateUserInfo(userInfo);
             if (!flag) {
                 result.put(Constants.STATUS, -1);
@@ -434,13 +445,15 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/user/library")
     public void getUserLibrarys(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
         try {
+            JSONObject result = new JSONObject();
+            String callback = request.getParameter("callback");
             UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
             if(null==userInfo){
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【用户未登录】");
+                getJson(request, response, callback, result.toString());
                 return ;
             }
-            JSONObject result = new JSONObject();
-            // 解决跨域
-            String callback = request.getParameter("callback");
             List<UserLibraryVo> list=libraryService.getUserLibraryList(userInfo.getId());
             if(null==list){
                 result.put(Constants.STATUS, -1);
@@ -984,12 +997,21 @@ public class UserController extends BaseController {
                 return;
             }
 
-            boolean flag=libraryService.appraiseTheBorrowed(userInfo.getId(), Integer.valueOf(logId),Constants.RELIABLE_STATUS_NO);
-            if(flag){
+            AppraiseCallBack appraiseCallBack=libraryService.appraiseTheBorrowed(userInfo.getId(), Integer.valueOf(logId),Constants.RELIABLE_STATUS_NO);
+            
+            if(appraiseCallBack.ordinal()==AppraiseCallBack.SCUCCES.ordinal()){
                 result.put(Constants.STATUS, 1);
                 result.put(Constants.MSG, "【给了对方一个不靠评价】");
                 getJson(request, response, callback, result.toString());
-            }else{
+            }else if(appraiseCallBack.ordinal()==AppraiseCallBack.RESCUCCES.ordinal()){
+                result.put(Constants.STATUS, 3);
+                result.put(Constants.MSG, "【重新给了对方一个不靠谱评价】");
+                getJson(request, response, callback, result.toString());
+            }else if(appraiseCallBack.ordinal()==AppraiseCallBack.Duplicate.ordinal()){
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【已经给了不靠谱评价啦】");
+                getJson(request, response, callback, result.toString());
+            }else if(appraiseCallBack.ordinal()==AppraiseCallBack.FAILURE.ordinal()){
                 result.put(Constants.STATUS, -1);
                 result.put(Constants.MSG, "【借出状态更新又罢工啦】我错了,原谅我吧!");
                 getJson(request, response, callback, result.toString());
@@ -1035,14 +1057,73 @@ public class UserController extends BaseController {
                 return;
             }
 
-            boolean flag=libraryService.appraiseTheBorrowed(userInfo.getId(), Integer.valueOf(logId),Constants.RELIABLE_STATUS_YES);
-            if(flag){
+            AppraiseCallBack appraiseCallBack=libraryService.appraiseTheBorrowed(userInfo.getId(), Integer.valueOf(logId),Constants.RELIABLE_STATUS_YES);           
+            if(appraiseCallBack.ordinal()==AppraiseCallBack.SCUCCES.ordinal()){
                 result.put(Constants.STATUS, 1);
                 result.put(Constants.MSG, "【给了对方一个靠谱评价】遇见一位爱书之人,美哉!");
                 getJson(request, response, callback, result.toString());
-            }else{
+            }else if(appraiseCallBack.ordinal()==AppraiseCallBack.RESCUCCES.ordinal()){
+                result.put(Constants.STATUS, 3);
+                result.put(Constants.MSG, "【重新给了对方一个靠谱评价】");
+                getJson(request, response, callback, result.toString());
+            }else if(appraiseCallBack.ordinal()==AppraiseCallBack.Duplicate.ordinal()){
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【已经给了靠谱评价啦】");
+                getJson(request, response, callback, result.toString());
+            }else if(appraiseCallBack.ordinal()==AppraiseCallBack.FAILURE.ordinal()){
                 result.put(Constants.STATUS, -1);
                 result.put(Constants.MSG, "【借出状态更新又罢工啦】我错了,原谅我吧!");
+                getJson(request, response, callback, result.toString());
+            }
+        } catch (Exception e) {
+            logger.error("借出状态更新异常 " + e);
+            String callback = request.getParameter("callback");
+            JSONObject result = new JSONObject();
+            try {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "靠,服务歇菜了!");
+            } catch (JSONException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            getJson(request, response, callback, result.toString());
+        }
+    }
+    
+    /**
+     * 图书下架
+     * 
+     * @throws IOException
+     */
+    @RequestMapping(value = "/user/delBook")
+    public void delBook(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+        try {
+            UserInfo userInfo=getLoginUserInfo(cacheService,request, response);
+            if(null==userInfo){
+                return ;
+            }
+            JSONObject result = new JSONObject();
+            // 解决跨域
+            String callback = request.getParameter("callback");
+            String bookId = "";
+            if (request.getParameter("bookId") != null) {
+                bookId = request.getParameter("bookId");
+            }
+            if (StringUtil.isEmpty(bookId)) {
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【借书id为空】悟空你又调皮了-_-");
+                getJson(request, response, callback, result.toString());
+                return;
+            }
+
+            boolean flag=libraryService.delBook(userInfo.getId(), Integer.parseInt(bookId.trim()));
+            if(flag){
+                result.put(Constants.STATUS, 1);
+                result.put(Constants.MSG, "【图书下架成功】!");
+                getJson(request, response, callback, result.toString());
+            }else{
+                result.put(Constants.STATUS, -1);
+                result.put(Constants.MSG, "【图书下架又罢工啦】我错了,原谅我吧!");
                 getJson(request, response, callback, result.toString());
             }
         } catch (Exception e) {

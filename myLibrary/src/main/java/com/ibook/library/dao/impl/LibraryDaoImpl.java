@@ -20,9 +20,11 @@ import org.springframework.stereotype.Repository;
 import com.ibook.library.cst.Constants;
 import com.ibook.library.dao.LibraryDao;
 import com.ibook.library.entity.Book;
+import com.ibook.library.entity.BookTag;
 import com.ibook.library.entity.Library;
 import com.ibook.library.entity.LibraryBook;
 import com.ibook.library.entity.PresentBookLog;
+import com.ibook.library.entity.Tag;
 import com.ibook.library.entity.UserBookLog;
 import com.ibook.library.entity.UserInfo;
 import com.ibook.library.entity.UserLibrary;
@@ -424,7 +426,7 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet result = null;
-        String sql = "select * from book where owner_user_id="+userId;
+        String sql = "select * from book where owner_user_id="+userId+" and status!="+Constants.BOOK_STATUS_PRIVATE;
         try {
             conn = dataSource.getConnection();
             ps = conn.prepareStatement(sql);
@@ -586,7 +588,7 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
         return list;
     }
 
-    public List<Library> getLibrarys(String query) {
+    public List<Library> getLibrarys(String query,String city) {
         long startTime = System.currentTimeMillis();
         List<Library> list=new ArrayList<Library>();
         Connection conn = null;
@@ -594,9 +596,9 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
         ResultSet rs = null;
         String sql ="";
         if(StringUtil.isEmpty(query)){
-             sql = "select * from library  order by library_name";
+             sql = "select * from library where city='"+city+"' order by library_name";
         }else{
-            sql = "select * from library where library_name like '%"+query+"%' order by library_name";
+            sql = "select * from library where  city='"+city+"' and library_name like '%"+query+"%' order by library_name";
         }
         try {
             conn = dataSource.getConnection();
@@ -613,7 +615,7 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
                 library.setLatitude(rs.getFloat("latitude"));
                 library.setAddress(rs.getString("address"));
                 library.setForPublic(rs.getBoolean("for_public"));
-
+                library.setType(rs.getInt("type"));
                 list.add(library);
             }
         } catch (Exception e) {
@@ -971,6 +973,32 @@ public class LibraryDaoImpl extends BaseDaoImpl implements LibraryDao {
             } catch (SQLException e) {
                 logger.error("finally ERROR"+e);
             }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean saveTag(Tag tag) {
+        long startTime = System.currentTimeMillis();
+        try {
+            save(tag);
+            logger.info("saveTag SUCCESS time:"+(System.currentTimeMillis() - startTime));
+        }catch(Exception e) {
+            logger.error("saveTag ERROR"+e);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean saveBookTag(BookTag bookTag) {
+        long startTime = System.currentTimeMillis();
+        try {
+            save(bookTag);
+            logger.info("saveBookTag SUCCESS time:"+(System.currentTimeMillis() - startTime));
+        }catch(Exception e) {
+            logger.error("saveBookTag ERROR"+e);
+            return false;
         }
         return true;
     }

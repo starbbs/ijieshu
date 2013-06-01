@@ -25,6 +25,7 @@ import com.ibook.library.entity.UserMessage;
 import com.ibook.library.service.CacheService;
 import com.ibook.library.service.LibraryService;
 import com.ibook.library.service.ThirdService;
+import com.ibook.library.util.AppraiseCallBack;
 import com.ibook.library.util.EmailUtil;
 import com.ibook.library.util.MD5;
 import com.ibook.library.util.Page;
@@ -151,6 +152,36 @@ public class LibraryServiceImpl implements LibraryService {
     }
     
     /**
+     * 新增书时，更新分类
+     * 
+     * @author xiaojianyu
+     */
+    public class Book2TagCommand implements Runnable {
+        
+        private Book book;
+        
+        public Book2TagCommand(Book book) {
+            this.book=book;
+        }
+
+        public void run() {
+            List<UserLibrary> list=cacheService.getUserLibraryList(book.getOwnerUserId());
+            for(UserLibrary userLibrary:list){
+                LibraryBook libraryBook=new LibraryBook();
+                libraryBook.setBookId(book.getId());
+                libraryBook.setImg(book.getMediumImg());
+                libraryBook.setLibraryId(userLibrary.getLibraryId());
+                libraryBook.setOwnerUserId(book.getOwnerUserId());
+                libraryBook.setTitle(book.getTitle());
+                libraryBook.setUrl(book.getAlt());
+                cacheService.saveLibraryBook(libraryBook);
+                cacheService.removeLibraryBookCount(userLibrary.getLibraryId());
+            }
+        }
+
+    }
+       
+    /**
      * 删除用户图书馆的某本书
      * 
      * @author xiaojianyu
@@ -261,7 +292,7 @@ public class LibraryServiceImpl implements LibraryService {
     }
 
     public List<Library> getLibrarys(String query,String city) {
-        return cacheService.getLibrarys(query);
+        return cacheService.getLibrarys(query,city);
     }
 
     public List<BookLogMessageVo> getBookLogMessageVos(int userId) {
@@ -438,26 +469,46 @@ public class LibraryServiceImpl implements LibraryService {
         return cacheService.unLockLibraryBook(userBookLog.getBookId());//图书馆的书同步解锁;
     }
     
-    public boolean appraiseTheBorrowed(int userId,int logId,int reliable) {
+    public AppraiseCallBack appraiseTheBorrowed(int userId,int logId,int reliable) {
+        AppraiseCallBack appraiseCallBack=null;
         UserBookLog userBookLog=cacheService.getUserBookLog(logId);
-        if(null==userBookLog || userBookLog.getOwnerUserId()!=userId || userBookLog.getBorrowReliable()!=Constants.RELIABLE_STATUS_NULL){
-            return false;
+        if(null==userBookLog || userBookLog.getOwnerUserId()!=userId){
+            return AppraiseCallBack.FAILURE;
         }
+        int oldReliable=userBookLog.getBorrowReliable();//原来的借阅评价记录               
         userBookLog.setBorrowReliable(reliable);
         boolean flag=cacheService.updateUserBookLog(userBookLog);//更新借阅者的靠谱信息
         if(!flag){
             logger.error("rejectBorrowBook ERROR,更新借阅记录失败");
-            return false;
+            return AppraiseCallBack.FAILURE;
         }
         UserInfo userInfo=cacheService.getUserInfo(userBookLog.getBorrowPassport());
         if(Constants.RELIABLE_STATUS_YES==reliable){
             userInfo.setReliableNum(userInfo.getReliableNum()+1);
-
+            if(Constants.RELIABLE_STATUS_YES==oldReliable){
+                return AppraiseCallBack.Duplicate;
+            }else if(Constants.RELIABLE_STATUS_NO==oldReliable){
+                userInfo.setUnReliableNum(userInfo.getUnReliableNum()>1?userInfo.getUnReliableNum()-1:0);
+                appraiseCallBack=AppraiseCallBack.RESCUCCES;
+            }else{
+                appraiseCallBack=AppraiseCallBack.SCUCCES;
+            }
         }else{
             userInfo.setUnReliableNum(userInfo.getUnReliableNum()+1);
+            if(Constants.RELIABLE_STATUS_NO==oldReliable){
+                return AppraiseCallBack.Duplicate;
+            }else if(Constants.RELIABLE_STATUS_YES==oldReliable){
+                userInfo.setReliableNum(userInfo.getReliableNum()>1?userInfo.getReliableNum()-1:0);
+                appraiseCallBack=AppraiseCallBack.RESCUCCES;            
+            }else{
+                appraiseCallBack=AppraiseCallBack.SCUCCES;
+            }
         }
         flag=cacheService.updateUserInfo(userInfo);//更新用户靠谱、不靠谱统计数
-        return flag;
+        if(!flag){
+            return AppraiseCallBack.FAILURE;
+        }
+        return appraiseCallBack;
     }
     
     public boolean presentBook(int userId, int logId) {
@@ -527,7 +578,7 @@ public class LibraryServiceImpl implements LibraryService {
         userInfo.setPassword(MD5.getMD5Str(password));
         boolean flag=cacheService.updateUserInfo(userInfo);
         if(flag){
-            EmailUtil.sendWarningMail("找回密码", "您的新密码为 "+password+" 请登录后修改密码! <a href='http://www.ijieshu.com>哎•借书<a/>'", passport);
+            EmailUtil.sendWarningMail("找回密码", "您的新密码为 "+password+" 请登录后修改密码! <a href='http://www.ijieshu.com>哎♥借书<a/>'", passport);
         }
         return flag;
     }
@@ -573,5 +624,18 @@ public class LibraryServiceImpl implements LibraryService {
         userInfo.setBorrowedLimit(userInfo.getBorrowedLimit()-1);
         boolean flag=cacheService.updateUserInfo(userInfo);
         return flag;
+    }
+
+    @Override
+    public boolean delBook(int userId, int bookId) {        
+        Book book=cacheService.getBook(bookId);
+        if(book.getStatus()!=Constants.BOOK_STATUS_FREE || book.getOwnerUserId()!=userId){
+            return false;
+        }
+        book.setStatus(Constants.BOOK_STATUS_PRIVATE);
+        cacheService.updateBook(book);
+        cacheService.removeBookList(userId);//清用户图书列表缓存
+        executorService.execute(new RemoveBook2LibraryCommand(book.getId(),userId));//从图书馆删除用户的图书
+        return true;
     }
 }
